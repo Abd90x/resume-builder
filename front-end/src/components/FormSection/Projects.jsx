@@ -1,16 +1,18 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Button } from "../ui/button";
 import { Loader, PlusCircle, Trash } from "lucide-react";
-import { ResumeInfoContext } from "@/context/ResumeInfoContext";
 import { useParams } from "react-router-dom";
-import globalApi from "@/services/globalApi";
 import { toast } from "sonner";
 import { Textarea } from "../ui/textarea";
+import { useSelector, useDispatch } from "react-redux";
+import actUpdateResume from "@/store/resume/act/actUpdateResume";
 
 const Projects = ({ enableNext }) => {
-  const { resumeInfo, setResumeInfo } = useContext(ResumeInfoContext);
+  const dispatch = useDispatch();
+  const { resume, loading, error } = useSelector((state) => state.resume);
+
   const [projectsList, setProjectsList] = useState([
     {
       projectName: "",
@@ -22,11 +24,10 @@ const Projects = ({ enableNext }) => {
   ]);
 
   const params = useParams();
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    resumeInfo?.projects?.length > 0 && setProjectsList(resumeInfo?.projects);
-  }, [resumeInfo]);
+    resume?.projects?.length > 0 && setProjectsList(resume?.projects);
+  }, [resume]);
 
   const handleChange = (event, index) => {
     enableNext(false);
@@ -34,7 +35,6 @@ const Projects = ({ enableNext }) => {
     const { name, value } = event.target;
     newEntries[index][name] = value;
     setProjectsList(newEntries);
-    setResumeInfo({ ...resumeInfo, projects: projectsList });
   };
 
   const addNewProjects = () => {
@@ -55,25 +55,20 @@ const Projects = ({ enableNext }) => {
   };
 
   const onSave = () => {
-    setLoading(true);
     const data = {
       data: {
-        projects: projectsList,
+        projects: projectsList.map(({ id, ...project }) => project),
       },
     };
 
     const resumeId = params.resumeId;
 
-    globalApi.UpdateResumeDetail(data, resumeId).then(
-      () => {
-        setLoading(false);
+    dispatch(actUpdateResume({ id: resumeId, data: data }))
+      .unwrap()
+      .then(() => {
         toast.success("Projects Details updated !");
         enableNext(true);
-      },
-      () => {
-        setLoading(false);
-      }
-    );
+      });
   };
   return (
     <div className="p-5 shadow-lg rounded-lg border-t-4 border-t-primary">
@@ -161,8 +156,8 @@ const Projects = ({ enableNext }) => {
             <PlusCircle />
           </Button>
         </div>
-        <Button disabled={loading} onClick={() => onSave()}>
-          {loading ? <Loader className="animate-spin" /> : "Save"}
+        <Button disabled={loading === "pending"} onClick={() => onSave()}>
+          {loading === "pending" ? <Loader className="animate-spin" /> : "Save"}
         </Button>
       </div>
     </div>

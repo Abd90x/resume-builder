@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-import globalApi from "@/services/globalApi";
 import { useUser } from "@clerk/clerk-react";
 
 // Icons
@@ -10,6 +9,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -17,16 +17,21 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import actCreateResume from "@/store/resume/act/actCreateResume";
 
 const AddResume = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [resumeTitle, setResumeTitle] = useState("");
   const { user } = useUser();
-  const [loading, setLoading] = useState(false);
-  const navigation = useNavigate();
+
+  const dispatch = useDispatch();
+
+  const { resume, loading, error } = useSelector((state) => state.resume);
+
+  const navigate = useNavigate();
 
   const onCreate = () => {
-    setLoading(true);
     const uuid = uuidv4();
     const data = {
       data: {
@@ -36,24 +41,16 @@ const AddResume = () => {
         userName: user?.fullName,
       },
     };
-
-    globalApi.CreateNewResume(data).then(
-      (res) => {
-        if (res) {
-          setLoading(false);
-          navigation(`/dashboard/resume/${res.data.data.documentId}/edit`);
-        }
-      },
-      () => {
-        setLoading(false);
-      }
-    );
-
-    setOpenDialog(false);
+    dispatch(actCreateResume(data))
+      .unwrap()
+      .then((res) => {
+        setOpenDialog(false);
+        navigate(`/dashboard/resume/${res.documentId}/edit`);
+      });
   };
 
   return (
-    <div>
+    <div role="button">
       <div
         className="flex items-center justify-center p-14 py-24   bg-secondary rounded-lg h-72 hover:scale-105 hover:shadow-md transition-all border border-dashed cursor-pointer"
         onClick={() => setOpenDialog(true)}
@@ -65,33 +62,39 @@ const AddResume = () => {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Create New Resume</DialogTitle>
-            <DialogDescription>
-              <div className="py-7">
-                <div className="flex flex-col gap-3">
-                  <Label htmlFor="resume">Add a title for your resume</Label>
-                  <Input
-                    placeholder="e.g. Software Engineer"
-                    id="resume"
-                    onChange={(e) => setResumeTitle(e.target.value)}
-                  />
-                </div>
-              </div>
-            </DialogDescription>
+          </DialogHeader>
+
+          <DialogDescription className="flex flex-col gap-3">
+            <Label htmlFor="resume">Add a title for your resume</Label>
+            <Input
+              placeholder="e.g. Software Engineer"
+              id="resume"
+              onChange={(e) => setResumeTitle(e.target.value)}
+            />
+          </DialogDescription>
+          <DialogFooter>
             <div className="flex items-center justify-end gap-4">
-              <Button variant="ghost" onClick={() => setOpenDialog(false)}>
+              <Button
+                disabled={loading === "pending"}
+                variant="ghost"
+                onClick={() => setOpenDialog(false)}
+              >
                 Cancel
               </Button>
-              <Button onClick={onCreate} disabled={!resumeTitle || loading}>
-                {loading ? (
-                  <span>
-                    <Loader className="animate-spin" /> Creating...
-                  </span>
+              <Button
+                onClick={onCreate}
+                disabled={!resumeTitle || loading === "pending"}
+              >
+                {loading === "pending" ? (
+                  <>
+                    Creating <Loader className="animate-spin" />
+                  </>
                 ) : (
                   "Create"
                 )}
               </Button>
             </div>
-          </DialogHeader>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

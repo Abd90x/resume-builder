@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowRight, House, LayoutGrid } from "lucide-react";
+import { ArrowLeft, ArrowRight, House } from "lucide-react";
 import PersonalDetails from "./FormSection/PersonalDetails";
 import { Button } from "./ui/button";
 import { useState } from "react";

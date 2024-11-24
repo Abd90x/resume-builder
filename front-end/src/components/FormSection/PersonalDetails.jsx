@@ -1,56 +1,52 @@
-import { ResumeInfoContext } from "@/context/ResumeInfoContext";
-import { useContext, useEffect, useState } from "react";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Button } from "../ui/button";
 import { useParams } from "react-router-dom";
-import globalApi from "@/services/globalApi";
 import { Loader } from "lucide-react";
 import { toast } from "sonner";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import actUpdateResume from "@/store/resume/act/actUpdateResume";
 
 const PersonalDetails = ({ enableNext }) => {
-  const { resumeInfo, setResumeInfo } = useContext(ResumeInfoContext);
+  const { resume, loading, error } = useSelector((state) => state.resume);
+
+  const dispatch = useDispatch();
+
   const [formData, setFormData] = useState();
-  const [loading, setLoading] = useState(false);
   const params = useParams();
 
   const handleInputChange = (e) => {
     enableNext(false);
     const { name, value } = e.target;
-    setResumeInfo({ ...resumeInfo, [name]: value });
     setFormData({ ...formData, [name]: value });
   };
 
   const onSave = (e) => {
     e.preventDefault();
-    setLoading(true);
 
     const resumeId = params.resumeId;
-    const data = { data: formData };
-    globalApi
-      .UpdateResumeDetail(data, resumeId)
-      .then((res) => {
-        enableNext(true);
-        setLoading(false);
+
+    dispatch(actUpdateResume({ id: resumeId, data: { data: formData } }))
+      .unwrap()
+      .then(() => {
         toast.success("Personal Details Updated!");
-      })
-      .catch((e) => {
-        setLoading(false);
+        enableNext(true);
       });
   };
 
   useEffect(() => {
     setFormData({
-      firstName: resumeInfo?.firstName,
-      lastName: resumeInfo?.lastName,
-      jobTitle: resumeInfo?.jobTitle,
-      address: resumeInfo?.address,
-      email: resumeInfo?.email,
-      phone: resumeInfo?.phone,
-      linkedin: resumeInfo?.linkedin,
-      github: resumeInfo?.github,
+      firstName: resume?.firstName,
+      lastName: resume?.lastName,
+      jobTitle: resume?.jobTitle,
+      address: resume?.address,
+      email: resume?.email,
+      phone: resume?.phone,
+      linkedin: resume?.linkedin,
+      github: resume?.github,
     });
-  }, []);
+  }, [dispatch, resume]);
 
   return (
     <div className="p-5 shadow-lg rounded-lg border-t-4 border-t-primary">
@@ -65,7 +61,7 @@ const PersonalDetails = ({ enableNext }) => {
               type="text"
               id="firstName"
               name="firstName"
-              defaultValue={resumeInfo?.firstName}
+              defaultValue={resume?.firstName}
               required
               onChange={handleInputChange}
             />
@@ -77,7 +73,7 @@ const PersonalDetails = ({ enableNext }) => {
               type="text"
               id="lastName"
               name="lastName"
-              defaultValue={resumeInfo?.lastName}
+              defaultValue={resume?.lastName}
               required
               onChange={handleInputChange}
             />
@@ -89,7 +85,7 @@ const PersonalDetails = ({ enableNext }) => {
               type="text"
               id="jobTitle"
               name="jobTitle"
-              defaultValue={resumeInfo?.jobTitle}
+              defaultValue={resume?.jobTitle}
               required
               onChange={handleInputChange}
             />
@@ -101,7 +97,7 @@ const PersonalDetails = ({ enableNext }) => {
               type="text"
               id="address"
               name="address"
-              defaultValue={resumeInfo?.address}
+              defaultValue={resume?.address}
               required
               onChange={handleInputChange}
             />
@@ -113,7 +109,7 @@ const PersonalDetails = ({ enableNext }) => {
               type="email"
               id="email"
               name="email"
-              defaultValue={resumeInfo?.email}
+              defaultValue={resume?.email}
               required
               onChange={handleInputChange}
             />
@@ -125,7 +121,7 @@ const PersonalDetails = ({ enableNext }) => {
               type="tel"
               id="phone"
               name="phone"
-              defaultValue={resumeInfo?.phone}
+              defaultValue={resume?.phone}
               required
               onChange={handleInputChange}
             />
@@ -137,7 +133,7 @@ const PersonalDetails = ({ enableNext }) => {
               type="tel"
               id="linkedin"
               name="linkedin"
-              defaultValue={resumeInfo?.linkedin}
+              defaultValue={resume?.linkedin}
               onChange={handleInputChange}
             />
           </div>
@@ -148,14 +144,14 @@ const PersonalDetails = ({ enableNext }) => {
               type="tel"
               id="github"
               name="github"
-              defaultValue={resumeInfo?.github}
+              defaultValue={resume?.github}
               onChange={handleInputChange}
             />
           </div>
 
           <div className="col-span-2 ms-auto">
-            <Button type="submit" disabled={loading}>
-              {loading ? (
+            <Button type="submit" disabled={loading === "pending"}>
+              {loading === "pending" ? (
                 <span className="flex items-center gap-2">
                   Saving
                   <Loader className="animate-spin" />

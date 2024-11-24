@@ -1,5 +1,3 @@
-import { ResumeInfoContext } from "@/context/ResumeInfoContext";
-import { useContext } from "react";
 import PersonalPreview from "./PreviewSection/PersonalPreview";
 import SummaryPreview from "./PreviewSection/SummeryPreview";
 import ExperiencePreview from "./PreviewSection/ExperiencePreview";
@@ -7,26 +5,28 @@ import EducationPreview from "./PreviewSection/EducationPreview";
 import SkillsPreview from "./PreviewSection/SkillsPreview";
 import ProjectsPreview from "./PreviewSection/ProjectsPreview";
 
+import { useSelector } from "react-redux";
+
 const ResumePreview = () => {
-  const { resumeInfo, setResumeInfo } = useContext(ResumeInfoContext);
+  const { resume, loading, error } = useSelector((state) => state.resume);
 
   return (
     <div
       className="h-full p-14 border-t-[20px] shadow-md print:shadow-none"
-      style={{ borderColor: resumeInfo?.themeColor }}
+      style={{ borderColor: resume?.themeColor }}
     >
       {/* Personal Details */}
-      <PersonalPreview resumeInfo={resumeInfo} />
+      <PersonalPreview resumeInfo={resume} />
       {/* Summery */}
-      <SummaryPreview resumeInfo={resumeInfo} />
+      <SummaryPreview resumeInfo={resume} />
       {/* Professional Experience */}
-      <ExperiencePreview resumeInfo={resumeInfo} />
+      <ExperiencePreview resumeInfo={resume} />
       {/* Projects */}
-      <ProjectsPreview resumeInfo={resumeInfo} />
+      <ProjectsPreview resumeInfo={resume} />
       {/* Educational */}
-      <EducationPreview resumeInfo={resumeInfo} />
+      <EducationPreview resumeInfo={resume} />
       {/* Skills */}
-      <SkillsPreview resumeInfo={resumeInfo} />
+      <SkillsPreview resumeInfo={resume} />
     </div>
   );
 };

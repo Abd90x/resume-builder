@@ -1,25 +1,25 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Button } from "../ui/button";
 import { Loader, PlusCircle, Trash } from "lucide-react";
 import RichTextEditor from "./RichTextEditor";
-import { ResumeInfoContext } from "@/context/ResumeInfoContext";
 import { useParams } from "react-router-dom";
-import globalApi from "@/services/globalApi";
 import { toast } from "sonner";
+import { useDispatch, useSelector } from "react-redux";
+import actUpdateResume from "@/store/resume/act/actUpdateResume";
 
 const Experience = ({ enableNext }) => {
-  const { resumeInfo, setResumeInfo } = useContext(ResumeInfoContext);
+  const dispatch = useDispatch();
   const [experinceList, setExperinceList] = useState([]);
 
   const params = useParams();
-  const [loading, setLoading] = useState(false);
+
+  const { resume, loading, error } = useSelector((state) => state.resume);
 
   useEffect(() => {
-    resumeInfo?.experience.length > 0 &&
-      setExperinceList(resumeInfo?.experience);
-  }, [resumeInfo]);
+    resume?.experience.length > 0 && setExperinceList(resume?.experience);
+  }, [resume]);
 
   const handleChange = (event, index) => {
     enableNext(false);
@@ -54,34 +54,21 @@ const Experience = ({ enableNext }) => {
     setExperinceList(newEntries);
   };
 
-  useEffect(() => {
-    setResumeInfo({
-      ...resumeInfo,
-      experience: experinceList,
-    });
-  }, [experinceList]);
-
   const onSave = () => {
-    setLoading(true);
     const data = {
       data: {
         experience: experinceList.map(({ id, ...exp }) => exp),
       },
     };
-
     const resumeId = params.resumeId;
-
-    globalApi.UpdateResumeDetail(data, resumeId).then(
-      () => {
-        setLoading(false);
-        toast.success("Details updated !");
+    dispatch(actUpdateResume({ id: resumeId, data: data }))
+      .unwrap()
+      .then(() => {
+        toast.success("Experience Details updated !");
         enableNext(true);
-      },
-      () => {
-        setLoading(false);
-      }
-    );
+      });
   };
+
   return (
     <div className="p-5 shadow-lg rounded-lg border-t-4 border-t-primary">
       <h2 className="font-bold text-lg">Professional Experiences</h2>
@@ -189,8 +176,8 @@ const Experience = ({ enableNext }) => {
             <PlusCircle />
           </Button>
         </div>
-        <Button disabled={loading} onClick={() => onSave()}>
-          {loading ? <Loader className="animate-spin" /> : "Save"}
+        <Button disabled={loading === "pending"} onClick={() => onSave()}>
+          {loading === "pending" ? <Loader className="animate-spin" /> : "Save"}
         </Button>
       </div>
     </div>

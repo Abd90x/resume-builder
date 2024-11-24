@@ -1,17 +1,19 @@
-import { ResumeInfoContext } from "@/context/ResumeInfoContext";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { Loader, Plus, Trash } from "lucide-react";
 import { useParams } from "react-router-dom";
-import globalApi from "@/services/globalApi";
 import { toast } from "sonner";
+import { useDispatch, useSelector } from "react-redux";
+import actUpdateResume from "@/store/resume/act/actUpdateResume";
 
 const Skills = ({ enableNext }) => {
+  const dispatch = useDispatch();
+
   const [softSkill, setSoftSkill] = useState("");
   const [technicalSkill, settechnicalSkill] = useState("");
-  const [loading, setLoading] = useState(false);
+
   const params = useParams();
 
   const [skills, setSkills] = useState({
@@ -19,7 +21,7 @@ const Skills = ({ enableNext }) => {
     technicalSkills: [],
   });
 
-  const { resumeInfo, setResumeInfo } = useContext(ResumeInfoContext);
+  const { resume, loading, error } = useSelector((state) => state.resume);
 
   const addSoftSkill = () => {
     if (softSkill === "") return;
@@ -77,15 +79,8 @@ const Skills = ({ enableNext }) => {
   };
 
   useEffect(() => {
-    resumeInfo?.skills && setSkills(resumeInfo?.skills);
-  }, []);
-
-  useEffect(() => {
-    setResumeInfo({
-      ...resumeInfo,
-      skills: skills,
-    });
-  }, [skills]);
+    resume?.skills && setSkills(resume?.skills);
+  }, [dispatch]);
 
   const removeTechnicalSkill = (idx) => {
     enableNext(false);
@@ -97,18 +92,13 @@ const Skills = ({ enableNext }) => {
   };
 
   const onSave = () => {
-    setLoading(true);
     const data = { data: { skills } };
     const resumeId = params.resumeId;
-    globalApi
-      .UpdateResumeDetail(data, resumeId)
-      .then((res) => {
-        enableNext(true);
-        setLoading(false);
+    dispatch(actUpdateResume({ id: resumeId, data: data }))
+      .unwrap()
+      .then(() => {
         toast.success("Skills Updated!");
-      })
-      .catch((e) => {
-        setLoading(false);
+        enableNext(true);
       });
   };
 
@@ -192,8 +182,8 @@ const Skills = ({ enableNext }) => {
           </div>
         </form>
         <div className="ms-auto">
-          <Button onClick={onSave} disabled={loading}>
-            {loading ? (
+          <Button onClick={onSave} disabled={loading === "pending"}>
+            {loading === "pending" ? (
               <span className="flex items-center gap-2">
                 Saving
                 <Loader className="animate-spin" />

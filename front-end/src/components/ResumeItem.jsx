@@ -1,7 +1,9 @@
+import { useDispatch, useSelector } from "react-redux";
 /* eslint-disable react/prop-types */
 import {
   ArrowBigDownDash,
   Eye,
+  Loader,
   Loader2,
   MoreVertical,
   Notebook,
@@ -16,47 +18,40 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { Button } from "./ui/button";
-
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "./ui/alert-dialog";
-import { useState } from "react";
-import globalApi from "@/services/globalApi";
-import { toast } from "sonner";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "./ui/label";
 
-const ResumeItem = ({ resume, refreshData }) => {
+import { useState } from "react";
+import { toast } from "sonner";
+import { useUser } from "@clerk/clerk-react";
+import actGetUserResumes from "@/store/resume/act/actGetUserResumes";
+import actDeleteResume from "@/store/resume/act/actDeleteResume";
+
+const ResumeItem = ({ resume }) => {
   const navigation = useNavigate();
 
   const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
 
-  const onMenuItemClick = (url) => {
-    navigation(url);
-  };
+  const { user } = useUser();
+  const dispatch = useDispatch();
+
+  const { loading } = useSelector((state) => state.resume);
 
   const deleteResume = () => {
-    setLoading(true);
-    globalApi.DeleteResume(resume.documentId).then(
-      () => {
-        setLoading(false);
-        setOpen(false);
+    dispatch(actDeleteResume(resume.documentId))
+      .unwrap()
+      .then(() => {
         toast.success("Resume deleted successfully");
-        refreshData();
-      },
-      (error) => {
-        setLoading(false);
+        dispatch(actGetUserResumes(user?.primaryEmailAddress?.emailAddress));
         setOpen(false);
-        toast.error("Something went wrong");
-      }
-    );
+      });
   };
 
   return (
@@ -72,7 +67,7 @@ const ResumeItem = ({ resume, refreshData }) => {
         <label>{resume.title}</label>
 
         <DropdownMenu>
-          <DropdownMenuTrigger>
+          <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon">
               <MoreVertical />
             </Button>
@@ -106,30 +101,42 @@ const ResumeItem = ({ resume, refreshData }) => {
         </DropdownMenu>
       </div>
 
-      <AlertDialog open={open} onOpenChange={setOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete your
-              resume and remove your data from our servers.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={deleteResume}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              {loading ? (
-                <Loader2 className="animate-spin w-4 h-4 mr-2" />
-              ) : (
-                "Delete"
-              )}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <Dialog onOpenChange={setOpen} open={open}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Are you absolutely sure?</DialogTitle>
+          </DialogHeader>
+
+          <DialogDescription>
+            This action cannot be undone. This will permanently delete your
+            resume and remove your data from our servers.
+          </DialogDescription>
+          <DialogFooter>
+            <div className="flex items-center justify-end gap-4">
+              <Button
+                disabled={loading === "pending"}
+                variant="ghost"
+                onClick={() => setOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={deleteResume}
+                disabled={loading === "pending"}
+              >
+                {loading === "pending" ? (
+                  <>
+                    Deleting <Loader className="animate-spin" />
+                  </>
+                ) : (
+                  "Delete"
+                )}
+              </Button>
+            </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

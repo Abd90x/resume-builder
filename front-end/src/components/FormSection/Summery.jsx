@@ -3,56 +3,53 @@ import { Loader, Sparkles } from "lucide-react";
 import { Button } from "../ui/button";
 import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
-import { useContext } from "react";
-import { ResumeInfoContext } from "@/context/ResumeInfoContext";
 import { toast } from "sonner";
 import { useParams } from "react-router-dom";
-import globalApi from "@/services/globalApi";
 import { AIChatSession } from "@/services/aiModel";
+import { useDispatch, useSelector } from "react-redux";
+import actUpdateResume from "@/store/resume/act/actUpdateResume";
 
 const Summary = ({ enableNext }) => {
-  const { resumeInfo, setResumeInfo } = useContext(ResumeInfoContext);
   const [summary, setSummary] = useState();
-  const [loading, setLoading] = useState(false);
+
   const params = useParams();
   const [aiGeneratedSummaryList, setAiGenerateSummaryList] = useState();
 
+  const { resume, loading, error } = useSelector((state) => state.resume);
+
+  const dispatch = useDispatch();
+  const [isGenerateAI, setIsGenerateAI] = useState(false);
+
   const onSave = (e) => {
     e.preventDefault();
-    setLoading(true);
-
     const resumeId = params.resumeId;
     const data = {
       data: {
         summary,
       },
     };
-    globalApi
-      .UpdateResumeDetail(data, resumeId)
-      .then((res) => {
-        enableNext(true);
-        setLoading(false);
+
+    dispatch(actUpdateResume({ id: resumeId, data: data }))
+      .unwrap()
+      .then(() => {
         toast.success("Summary Updated!");
-      })
-      .catch((e) => {
-        setLoading(false);
+        enableNext(true);
       });
   };
 
-  const generateSummaryFromAI = async () => {
-    setLoading(true);
-    const prompt = `Job Title: ${resumeInfo?.jobTitle} , Depends on job title give me list of  Summary for 3 experience level, Mid Level and Freasher level in 3 -4 lines in array format, With "summary" and "experience_level" Field in JSON Format`;
-    const result = await AIChatSession.sendMessage(prompt);
-
-    console.log("result", JSON.parse([result.response.text()]));
-
-    setAiGenerateSummaryList(JSON.parse([result.response.text()]));
-    setLoading(false);
-  };
-
   useEffect(() => {
-    summary && setResumeInfo({ ...resumeInfo, summary });
-  }, [summary]);
+    if (resume) {
+      setSummary(resume?.summary);
+    }
+  }, [resume]);
+
+  const generateSummaryFromAI = async () => {
+    setIsGenerateAI(true);
+    const prompt = `Job Title: ${resume?.jobTitle} , Depends on job title give me list of  Summary for 3 experience level, Mid Level and Freasher level in 3 -4 lines in array format, With "summary" and "experience_level" Field in JSON Format`;
+    const result = await AIChatSession.sendMessage(prompt);
+    setAiGenerateSummaryList(JSON.parse([result.response.text()]));
+    setIsGenerateAI(false);
+  };
 
   return (
     <div className="p-5 shadow-lg rounded-lg border-t-4 border-t-primary">
@@ -67,22 +64,32 @@ const Summary = ({ enableNext }) => {
             size="sm"
             className="border-primary text-primary hover:bg-primary hover:text-white"
             type="button"
+            disabled={isGenerateAI}
             onClick={generateSummaryFromAI}
           >
-            Generate from AI
-            <Sparkles />
+            {isGenerateAI ? (
+              <>
+                Generating
+                <Loader className="animate-spin" />
+              </>
+            ) : (
+              <>
+                Generate from AI
+                <Sparkles />
+              </>
+            )}
           </Button>
         </div>
         <Textarea
           required
           onChange={(e) => setSummary(e.target.value)}
           value={summary}
-          defaultValue={resumeInfo?.summary}
+          defaultValue={resume?.summary}
           className="h-60"
         />
         <div className="ms-auto">
-          <Button type="submit" disabled={loading}>
-            {loading ? (
+          <Button type="submit" disabled={loading === "pending"}>
+            {loading === "pending" ? (
               <span className="flex items-center gap-2">
                 Saving
                 <Loader className="animate-spin" />

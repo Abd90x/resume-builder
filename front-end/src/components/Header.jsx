@@ -3,7 +3,7 @@ import { Button } from "./ui/button";
 import { UserButton, useUser } from "@clerk/clerk-react";
 
 const Header = () => {
-  const { user, isSignedIn } = useUser();
+  const { isSignedIn } = useUser();
 
   return (
     <header className="bg-white/20 backdrop-blur print:hidden border-b">

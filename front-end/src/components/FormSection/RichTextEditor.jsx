@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   BtnBold,
   BtnBulletList,
@@ -15,21 +15,19 @@ import {
 import { Button } from "../ui/button";
 import { Loader, WandSparkles } from "lucide-react";
 import { Label } from "../ui/label";
-import { ResumeInfoContext } from "@/context/ResumeInfoContext";
 import { toast } from "sonner";
 import { AIChatSession } from "@/services/aiModel";
+import { useSelector } from "react-redux";
 
 const RichTextEditor = ({ onRichTextEditorChange, index, defaultValue }) => {
   const [value, setValue] = useState();
-  const { resumeInfo, setResumeInfo } = useContext(ResumeInfoContext);
-  const [loading, setLoading] = useState(false);
+
+  const { resume, loading, error } = useSelector((state) => state.resume);
 
   const generateSummaryFromAI = async () => {
-    setLoading(true);
-    const position = resumeInfo.experience[index].title;
+    const position = resume.experience[index].title;
     if (!position) {
       toast.error("Please enter a job title to generate the summary");
-      setLoading(false);
       return;
     }
     const prompt = `In my role as ${position} give me 2 - 3 lines for my current job overview in resume`;
@@ -39,18 +37,17 @@ const RichTextEditor = ({ onRichTextEditorChange, index, defaultValue }) => {
     res = res.replace(/[^a-zA-Z0-9]/g, " ");
     setValue(res);
 
-    setResumeInfo({
-      ...resumeInfo,
-      experience: [
-        ...resumeInfo.experience.slice(0, index),
-        {
-          ...resumeInfo.experience[index],
-          workSummary: res,
-        },
-        ...resumeInfo.experience.slice(index + 1),
-      ],
-    });
-    setLoading(false);
+    // setResumeInfo({
+    //   ...resume,
+    //   experience: [
+    //     ...resume.experience.slice(0, index),
+    //     {
+    //       ...resume.experience[index],
+    //       workSummary: res,
+    //     },
+    //     ...resume.experience.slice(index + 1),
+    //   ],
+    // });
   };
 
   useEffect(() => {
@@ -65,9 +62,9 @@ const RichTextEditor = ({ onRichTextEditorChange, index, defaultValue }) => {
           size="sm"
           variant="outline"
           onClick={generateSummaryFromAI}
-          disabled={loading}
+          disabled={loading === "pending"}
         >
-          {loading ? (
+          {loading === "pending" ? (
             <>
               Generating <Loader className="animate-spin" />
             </>

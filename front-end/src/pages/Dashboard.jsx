@@ -1,23 +1,21 @@
 import AddResume from "@/components/AddResume";
 import ResumeItem from "@/components/ResumeItem";
-import globalApi from "@/services/globalApi";
+import actGetUserResumes from "@/store/resume/act/actGetUserResumes";
 import { useUser } from "@clerk/clerk-react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 const Dashboard = () => {
   const { user } = useUser();
-  const [resumeList, setResumeList] = useState([]);
 
-  const getResumesList = () => {
-    const email = user?.primaryEmailAddress?.emailAddress;
-    globalApi.GetUserResumes(email).then((res) => {
-      setResumeList(res.data.data);
-    });
-  };
+  const dispatch = useDispatch();
+
+  const { resumes, loading, error } = useSelector((state) => state.userResumes);
 
   useEffect(() => {
-    user && getResumesList();
-  }, [user]);
+    user &&
+      dispatch(actGetUserResumes(user?.primaryEmailAddress?.emailAddress));
+  }, [user, dispatch]);
 
   return (
     <div className="container flex flex-col gap-8 py-14">
@@ -28,13 +26,9 @@ const Dashboard = () => {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
         <AddResume />
-        {resumeList.length > 0 &&
-          resumeList.map((resume) => (
-            <ResumeItem
-              resume={resume}
-              key={resume.id}
-              refreshData={getResumesList}
-            />
+        {resumes?.data &&
+          resumes.data.map((resume) => (
+            <ResumeItem resume={resume} key={resume.id} />
           ))}
       </div>
     </div>

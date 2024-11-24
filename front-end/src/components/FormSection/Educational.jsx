@@ -1,16 +1,18 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Button } from "../ui/button";
 import { Loader, PlusCircle, Trash } from "lucide-react";
-import { ResumeInfoContext } from "@/context/ResumeInfoContext";
 import { useParams } from "react-router-dom";
-import globalApi from "@/services/globalApi";
 import { toast } from "sonner";
 import { Textarea } from "../ui/textarea";
+import { useSelector, useDispatch } from "react-redux";
+import actUpdateResume from "@/store/resume/act/actUpdateResume";
 
 const Educational = ({ enableNext }) => {
-  const { resumeInfo, setResumeInfo } = useContext(ResumeInfoContext);
+  const dispatch = useDispatch();
+  const { resume, loading, error } = useSelector((state) => state.resume);
+
   const [educationList, setEducationList] = useState([
     {
       universityName: "",
@@ -23,11 +25,10 @@ const Educational = ({ enableNext }) => {
   ]);
 
   const params = useParams();
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    resumeInfo?.education.length > 0 && setEducationList(resumeInfo?.education);
-  }, [resumeInfo]);
+    resume?.education.length > 0 && setEducationList(resume?.education);
+  }, [resume]);
 
   const handleChange = (event, index) => {
     enableNext(false);
@@ -35,7 +36,7 @@ const Educational = ({ enableNext }) => {
     const { name, value } = event.target;
     newEntries[index][name] = value;
     setEducationList(newEntries);
-    setResumeInfo({ ...resumeInfo, education: educationList });
+    // setResumeInfo({ ...resumeInfo, education: educationList });
   };
 
   const addNewEducation = () => {
@@ -57,25 +58,18 @@ const Educational = ({ enableNext }) => {
   };
 
   const onSave = () => {
-    setLoading(true);
     const data = {
       data: {
-        education: educationList,
+        education: educationList.map(({ id, ...edu }) => edu),
       },
     };
-
     const resumeId = params.resumeId;
-
-    globalApi.UpdateResumeDetail(data, resumeId).then(
-      () => {
-        setLoading(false);
+    dispatch(actUpdateResume({ id: resumeId, data: data }))
+      .unwrap()
+      .then(() => {
         toast.success("Education Details updated !");
         enableNext(true);
-      },
-      () => {
-        setLoading(false);
-      }
-    );
+      });
   };
   return (
     <div className="p-5 shadow-lg rounded-lg border-t-4 border-t-primary">
@@ -175,8 +169,8 @@ const Educational = ({ enableNext }) => {
             <PlusCircle />
           </Button>
         </div>
-        <Button disabled={loading} onClick={() => onSave()}>
-          {loading ? <Loader className="animate-spin" /> : "Save"}
+        <Button disabled={loading === "pending"} onClick={() => onSave()}>
+          {loading === "pending" ? <Loader className="animate-spin" /> : "Save"}
         </Button>
       </div>
     </div>

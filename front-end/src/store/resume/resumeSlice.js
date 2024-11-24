@@ -52,7 +52,10 @@ const resumeSlice = createSlice({
     });
     builder.addCase(actUpdateResume.fulfilled, (state, action) => {
       state.loading = "succeeded";
-      state.resume = action.payload;
+      state.resume = {
+        ...state.resume,
+        ...action.payload.data,
+      };
     });
     builder.addCase(actUpdateResume.rejected, (state, action) => {
       state.loading = "failed";

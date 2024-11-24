@@ -6,60 +6,45 @@ import {
 import { LayoutGrid, Loader } from "lucide-react";
 import { Button } from "../ui/button";
 import { Label } from "../ui/label";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { HexColorPicker } from "react-colorful";
-import { ResumeInfoContext } from "@/context/ResumeInfoContext";
-import globalApi from "@/services/globalApi";
 import { toast } from "sonner";
 import { useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import actUpdateResume from "@/store/resume/act/actUpdateResume";
 
 const ThemeColor = () => {
   const [color, setColor] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const resumeId = useParams().resumeId;
-  const { resumeInfo, setResumeInfo } = useContext(ResumeInfoContext);
+
+  const { resume, loading, error } = useSelector((state) => state.resume);
+
+  const dispatch = useDispatch();
 
   const handleSave = () => {
-    setLoading(true);
-    setResumeInfo({
-      ...resumeInfo,
-      themeColor: color,
-    });
-    setOpen(false);
-    globalApi
-      .UpdateResumeDetail(
-        {
+    dispatch(
+      actUpdateResume({
+        id: resumeId,
+        data: {
           data: {
             themeColor: color,
           },
         },
-        resumeId
-      )
-      .then(
-        () => {
-          toast.success("Theme color updated !");
-          setLoading(false);
-        },
-        () => {
-          toast.error("Something went wrong !");
-          setLoading(false);
-        }
-      );
+      })
+    )
+      .unwrap()
+      .then(() => {
+        toast.success("Theme color updated !");
+        setOpen(false);
+      });
   };
 
   useEffect(() => {
-    if (resumeInfo?.themeColor) {
-      setColor(resumeInfo?.themeColor);
+    if (resume?.themeColor) {
+      setColor(resume?.themeColor);
     }
-  }, []);
-
-  useEffect(() => {
-    setResumeInfo({
-      ...resumeInfo,
-      themeColor: color,
-    });
-  }, [color]);
+  }, [dispatch]);
 
   const colors = [
     "#FF5733",
@@ -73,9 +58,9 @@ const ThemeColor = () => {
   ];
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger disabled={loading}>
-        <Button disabled={loading} variant="outline">
-          {loading ? (
+      <PopoverTrigger asChild disabled={loading === "pending"}>
+        <Button disabled={loading === "pending"} variant="outline">
+          {loading === "pending" ? (
             <>
               <Loader className="animate-spin" />
             </>
@@ -109,7 +94,15 @@ const ThemeColor = () => {
           </div>
 
           <div className="flex justify-end">
-            <Button onClick={handleSave}>Save</Button>
+            <Button disabled={loading === "pending"} onClick={handleSave}>
+              {loading === "pending" ? (
+                <>
+                  <Loader className="animate-spin" />
+                </>
+              ) : (
+                "Save"
+              )}
+            </Button>
           </div>
         </div>
       </PopoverContent>
