@@ -13,7 +13,7 @@ import {
   Toolbar,
 } from "react-simple-wysiwyg";
 import { Button } from "../ui/button";
-import { Loader, WandSparkles } from "lucide-react";
+import { Loader, Sparkles } from "lucide-react";
 import { Label } from "../ui/label";
 import { toast } from "sonner";
 import { AIChatSession } from "@/services/aiModel";
@@ -36,18 +36,11 @@ const RichTextEditor = ({ onRichTextEditorChange, index, defaultValue }) => {
     let res = result.response.text();
     res = res.replace(/[^a-zA-Z0-9]/g, " ");
     setValue(res);
-
-    // setResumeInfo({
-    //   ...resume,
-    //   experience: [
-    //     ...resume.experience.slice(0, index),
-    //     {
-    //       ...resume.experience[index],
-    //       workSummary: res,
-    //     },
-    //     ...resume.experience.slice(index + 1),
-    //   ],
-    // });
+    onRichTextEditorChange({
+      target: {
+        value: res,
+      },
+    });
   };
 
   useEffect(() => {
@@ -61,6 +54,7 @@ const RichTextEditor = ({ onRichTextEditorChange, index, defaultValue }) => {
         <Button
           size="sm"
           variant="outline"
+          className="border-primary text-primary hover:bg-primary hover:text-white"
           onClick={generateSummaryFromAI}
           disabled={loading === "pending"}
         >
@@ -70,7 +64,7 @@ const RichTextEditor = ({ onRichTextEditorChange, index, defaultValue }) => {
             </>
           ) : (
             <>
-              Generate from AI <WandSparkles />
+              Generate from AI <Sparkles />
             </>
           )}
         </Button>

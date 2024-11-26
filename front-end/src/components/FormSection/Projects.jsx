@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { Textarea } from "../ui/textarea";
 import { useSelector, useDispatch } from "react-redux";
 import actUpdateResume from "@/store/resume/act/actUpdateResume";
+import { editResume } from "@/store/resume/resumeSlice";
 
 const Projects = ({ enableNext }) => {
   const dispatch = useDispatch();
@@ -31,10 +32,11 @@ const Projects = ({ enableNext }) => {
 
   const handleChange = (event, index) => {
     enableNext(false);
-    const newEntries = projectsList.slice();
+    const newEntries = JSON.parse(JSON.stringify(projectsList));
     const { name, value } = event.target;
     newEntries[index][name] = value;
     setProjectsList(newEntries);
+    dispatch(editResume({ ...resume, projects: newEntries }));
   };
 
   const addNewProjects = () => {
@@ -51,7 +53,9 @@ const Projects = ({ enableNext }) => {
   };
 
   const removeProjects = () => {
-    setProjectsList((projectsList) => projectsList.slice(0, -1));
+    const newEntries = JSON.parse(JSON.stringify(projectsList));
+    setProjectsList(newEntries);
+    dispatch(editResume({ ...resume, projects: newEntries }));
   };
 
   const onSave = () => {

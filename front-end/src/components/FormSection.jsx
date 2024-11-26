@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowRight, House } from "lucide-react";
+import { ArrowBigDownDash, ArrowLeft, ArrowRight, House } from "lucide-react";
 import PersonalDetails from "./FormSection/PersonalDetails";
 import { Button } from "./ui/button";
 import { useState } from "react";
@@ -40,7 +40,15 @@ const FormSection = () => {
             disabled={!enableNext}
             onClick={() => setActiveFormIndex((prv) => prv + 1)}
           >
-            Next <ArrowRight />
+            {activeFormIndex === 6 ? (
+              <>
+                Download <ArrowBigDownDash />
+              </>
+            ) : (
+              <>
+                Next <ArrowRight />
+              </>
+            )}
           </Button>
         </div>
       </div>

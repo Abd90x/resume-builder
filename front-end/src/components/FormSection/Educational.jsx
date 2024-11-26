@@ -8,6 +8,8 @@ import { toast } from "sonner";
 import { Textarea } from "../ui/textarea";
 import { useSelector, useDispatch } from "react-redux";
 import actUpdateResume from "@/store/resume/act/actUpdateResume";
+import { editResume } from "@/store/resume/resumeSlice";
+import { Checkbox } from "../ui/checkbox";
 
 const Educational = ({ enableNext }) => {
   const dispatch = useDispatch();
@@ -32,14 +34,16 @@ const Educational = ({ enableNext }) => {
 
   const handleChange = (event, index) => {
     enableNext(false);
-    const newEntries = educationList.slice();
+    const newEntries = JSON.parse(JSON.stringify(educationList));
     const { name, value } = event.target;
     newEntries[index][name] = value;
     setEducationList(newEntries);
-    // setResumeInfo({ ...resumeInfo, education: educationList });
+
+    dispatch(editResume({ ...resume, education: newEntries }));
   };
 
   const addNewEducation = () => {
+    enableNext(false);
     setEducationList([
       ...educationList,
       {
@@ -54,7 +58,24 @@ const Educational = ({ enableNext }) => {
   };
 
   const removeEducation = () => {
-    setEducationList((educationList) => educationList.slice(0, -1));
+    const newEntries = JSON.parse(JSON.stringify(educationList));
+
+    setEducationList(newEntries);
+
+    dispatch(editResume({ ...resume, education: newEntries }));
+  };
+
+  const handleCheckBoxChange = (e, index) => {
+    enableNext(false);
+    const newEntries = JSON.parse(JSON.stringify(educationList));
+
+    newEntries[index] = {
+      ...newEntries[index],
+      currentlyStudy: e,
+      endDate: e ? "" : newEntries[index].endDate,
+    };
+    setEducationList(newEntries);
+    dispatch(editResume({ ...resume, education: newEntries }));
   };
 
   const onSave = () => {
@@ -128,7 +149,11 @@ const Educational = ({ enableNext }) => {
                   />
                 </div>
 
-                <div className="flex flex-col gap-1.5">
+                <div
+                  className={`${
+                    item.currentlyStudy ? "hidden" : "flex"
+                  } flex-col gap-1.5`}
+                >
                   <Label htmlFor="endDate">End Date</Label>
                   <Input
                     type="date"
@@ -138,6 +163,19 @@ const Educational = ({ enableNext }) => {
                     defaultValue={item?.endDate}
                     onChange={(e) => handleChange(e, idx)}
                   />
+                </div>
+
+                <div className="flex items-center gap-1.5 mt-5">
+                  <Checkbox
+                    id={`currentlyStudy-${idx}`}
+                    name="currentlyStudy"
+                    onCheckedChange={(e) => handleCheckBoxChange(e, idx)}
+                    defaultValue={item?.currentlyStudy}
+                    checked={item?.currentlyStudy}
+                  />
+                  <Label htmlFor={`currentlyStudy-${idx}`}>
+                    Currently Studying
+                  </Label>
                 </div>
 
                 <div className="flex flex-col gap-1.5 col-span-2">

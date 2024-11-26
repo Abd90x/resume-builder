@@ -7,94 +7,60 @@ import { useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
 import actUpdateResume from "@/store/resume/act/actUpdateResume";
+import { editResume } from "@/store/resume/resumeSlice";
 
 const Skills = ({ enableNext }) => {
   const dispatch = useDispatch();
-
-  const [softSkill, setSoftSkill] = useState("");
-  const [technicalSkill, settechnicalSkill] = useState("");
-
   const params = useParams();
 
-  const [skills, setSkills] = useState({
-    softSkills: [],
-    technicalSkills: [],
-  });
+  const [skillInput, setSkillInput] = useState({ soft: "", technical: "" });
+  const [skills, setSkills] = useState({ softSkills: [], technicalSkills: [] });
 
-  const { resume, loading, error } = useSelector((state) => state.resume);
+  const { resume, loading } = useSelector((state) => state.resume);
 
-  const addSoftSkill = () => {
-    if (softSkill === "") return;
-    enableNext(false);
-
-    if (skills && skills?.softSkills.length > 0) {
-      setSkills((skills) => {
-        return {
-          ...skills,
-          softSkills: [...skills?.softSkills, softSkill],
-        };
-      });
-    } else {
-      setSkills((skills) => {
-        return {
-          ...skills,
-          softSkills: [softSkill],
-        };
-      });
-    }
-
-    setSoftSkill("");
-  };
-
-  const removeSoftSkill = (idx) => {
-    enableNext(false);
-    const newSkills = skills?.softSkills.filter((_, i) => i !== idx);
-    setSkills({
-      ...skills,
-      softSkills: newSkills,
-    });
-  };
-
-  const addTechnicalSkill = () => {
-    console.log(skills);
-    if (technicalSkill === "") return;
-    enableNext(false);
-
-    if (skills && skills?.technicalSkills.length > 0) {
-      setSkills((skills) => {
-        return {
-          ...skills,
-          technicalSkills: [...skills?.technicalSkills, technicalSkill],
-        };
-      });
-    } else {
-      setSkills((skills) => {
-        return {
-          ...skills,
-          technicalSkills: [technicalSkill],
-        };
-      });
-    }
-    settechnicalSkill("");
-  };
-
+  // Fetch skills from resume on mount
   useEffect(() => {
-    resume?.skills && setSkills(resume?.skills);
-  }, [dispatch]);
+    if (resume?.skills) setSkills(resume.skills);
+  }, [resume]);
 
-  const removeTechnicalSkill = (idx) => {
-    enableNext(false);
-    const newSkills = skills?.technicalSkills.filter((_, i) => i !== idx);
-    setSkills({
+  // Generic function to add a skill
+  const addSkill = (type) => {
+    const skillKey = type === "soft" ? "softSkills" : "technicalSkills";
+    const newSkill = skillInput[type].trim();
+
+    if (!newSkill) return toast.error("Skill cannot be empty!");
+    if (skills[skillKey].includes(newSkill)) {
+      return toast.error("Skill already exists!");
+    }
+
+    const updatedSkills = {
       ...skills,
-      technicalSkills: newSkills,
-    });
+      [skillKey]: [...skills[skillKey], newSkill],
+    };
+
+    setSkills(updatedSkills);
+    dispatch(editResume({ ...resume, skills: updatedSkills }));
+    setSkillInput({ ...skillInput, [type]: "" });
+    enableNext(false);
   };
 
-  const onSave = () => {
-    const data = { data: { skills } };
+  // Generic function to remove a skill
+  const removeSkill = (type, idx) => {
+    const skillKey = type === "soft" ? "softSkills" : "technicalSkills";
+    const updatedSkills = {
+      ...skills,
+      [skillKey]: skills[skillKey].filter((_, i) => i !== idx),
+    };
+
+    setSkills(updatedSkills);
+    dispatch(editResume({ ...resume, skills: updatedSkills }));
+    enableNext(false);
+  };
+
+  // Save changes
+  const handleSave = () => {
     const resumeId = params.resumeId;
-    dispatch(actUpdateResume({ id: resumeId, data: data }))
+    dispatch(actUpdateResume({ id: resumeId, data: { data: { skills } } }))
       .unwrap()
       .then(() => {
         toast.success("Skills Updated!");
@@ -107,82 +73,55 @@ const Skills = ({ enableNext }) => {
       <h2 className="font-bold text-lg">Skills</h2>
       <p>Add your Skills</p>
       <div className="flex flex-col gap-8 mt-5">
-        <form className="flex flex-col gap-1.5">
-          <Label htmlFor="title">Soft Skills</Label>
-          <Input
-            type="text"
-            placeholder="Skill"
-            value={softSkill}
-            onChange={(e) => {
-              setSoftSkill(e.target.value);
-            }}
-          />
-          <div className="flex justify-between mt-2">
-            <div className="flex gap-1.5 flex-wrap grow">
-              {skills?.softSkills &&
-                skills?.softSkills.map((skill, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-center gap-2 border border-primary rounded-md text-primary text-xs px-2 py-1.5"
-                  >
-                    <span>{skill}</span>
-                    <Trash
-                      size={16}
-                      className="hover:text-red-600"
-                      onClick={() => removeSoftSkill(idx)}
-                    />
-                  </div>
-                ))}
-            </div>
-            <Button
-              size="sm"
-              disabled={softSkill === ""}
-              onClick={addSoftSkill}
-            >
-              Add
-              <Plus />
-            </Button>
-          </div>
-        </form>
-        <form className="flex flex-col gap-1.5">
-          <Label htmlFor="title">Technical Skills</Label>
-          <Input
-            type="text"
-            placeholder="Skill"
-            value={technicalSkill}
-            onChange={(e) => {
-              settechnicalSkill(e.target.value);
-            }}
-          />
-          <div className="flex justify-between mt-2">
-            <div className="flex gap-1.5 flex-wrap grow">
-              {skills?.technicalSkills &&
-                skills?.technicalSkills.map((skill, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-center gap-2 border border-primary rounded-md text-primary text-xs px-2 py-1.5"
-                  >
-                    <span>{skill}</span>
-                    <Trash
-                      size={16}
-                      className="hover:text-red-600"
-                      onClick={() => removeTechnicalSkill(idx)}
-                    />
-                  </div>
-                ))}
-            </div>
-            <Button
-              size="sm"
-              disabled={technicalSkill === ""}
-              onClick={addTechnicalSkill}
-            >
-              Add
-              <Plus />
-            </Button>
-          </div>
-        </form>
+        {/* Reusable Skill Input */}
+        {["soft", "technical"].map((type) => {
+          const skillKey = type === "soft" ? "softSkills" : "technicalSkills";
+          const label = type === "soft" ? "Soft Skills" : "Technical Skills";
+
+          return (
+            <form key={type} className="flex flex-col gap-1.5">
+              <Label htmlFor={type}>{label}</Label>
+              <Input
+                id={type}
+                type="text"
+                placeholder="Add a skill"
+                value={skillInput[type]}
+                onChange={(e) =>
+                  setSkillInput({ ...skillInput, [type]: e.target.value })
+                }
+              />
+              <div className="flex justify-between mt-2">
+                <div className="flex gap-1.5 flex-wrap grow">
+                  {skills[skillKey].map((skill, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-center gap-2 border border-primary rounded-md text-primary text-xs px-2 py-1.5"
+                    >
+                      <span>{skill}</span>
+                      <Trash
+                        size={16}
+                        className="hover:text-red-600 cursor-pointer"
+                        onClick={() => removeSkill(type, idx)}
+                      />
+                    </div>
+                  ))}
+                </div>
+                <Button
+                  size="sm"
+                  disabled={!skillInput[type]}
+                  onClick={() => addSkill(type)}
+                >
+                  Add
+                  <Plus />
+                </Button>
+              </div>
+            </form>
+          );
+        })}
+
+        {/* Save Button */}
         <div className="ms-auto">
-          <Button onClick={onSave} disabled={loading === "pending"}>
+          <Button onClick={handleSave} disabled={loading === "pending"}>
             {loading === "pending" ? (
               <span className="flex items-center gap-2">
                 Saving

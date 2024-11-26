@@ -8,6 +8,8 @@ import { useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
 import actUpdateResume from "@/store/resume/act/actUpdateResume";
+import { editResume } from "@/store/resume/resumeSlice";
+import { Checkbox } from "../ui/checkbox";
 
 const Experience = ({ enableNext }) => {
   const dispatch = useDispatch();
@@ -23,13 +25,15 @@ const Experience = ({ enableNext }) => {
 
   const handleChange = (event, index) => {
     enableNext(false);
-    const newEntries = experinceList.slice();
+    const newEntries = JSON.parse(JSON.stringify(experinceList));
     const { name, value } = event.target;
     newEntries[index][name] = value;
     setExperinceList(newEntries);
+    dispatch(editResume({ ...resume, experience: newEntries }));
   };
 
   const addNewExperience = () => {
+    enableNext(false);
     setExperinceList([
       ...experinceList,
       {
@@ -39,19 +43,26 @@ const Experience = ({ enableNext }) => {
         state: "",
         startDate: "",
         endDate: "",
-        workSummary: "",
+        workSummery: "",
       },
     ]);
   };
 
   const removeExperience = () => {
-    setExperinceList((experinceList) => experinceList.slice(0, -1));
+    const newEntries = experinceList.slice(0, -1);
+
+    setExperinceList(newEntries);
+    dispatch(editResume({ ...resume, experience: newEntries }));
   };
 
   const handleRichTextEditor = (e, index) => {
-    const newEntries = experinceList.slice();
-    newEntries[index]["workSummary"] = e.target.value;
+    enableNext(false);
+    const value = e.target.value;
+    const newEntries = JSON.parse(JSON.stringify(experinceList));
+    newEntries[index]["workSummery"] = value;
     setExperinceList(newEntries);
+
+    dispatch(editResume({ ...resume, experience: newEntries }));
   };
 
   const onSave = () => {
@@ -67,6 +78,19 @@ const Experience = ({ enableNext }) => {
         toast.success("Experience Details updated !");
         enableNext(true);
       });
+  };
+
+  const handleCheckBoxChange = (e, index) => {
+    enableNext(false);
+    const newEntries = JSON.parse(JSON.stringify(experinceList));
+
+    newEntries[index] = {
+      ...newEntries[index],
+      currentlyWorking: e,
+      endDate: e ? "" : newEntries[index].endDate,
+    };
+    setExperinceList(newEntries);
+    dispatch(editResume({ ...resume, experience: newEntries }));
   };
 
   return (
@@ -138,7 +162,11 @@ const Experience = ({ enableNext }) => {
                   />
                 </div>
 
-                <div className="flex flex-col gap-1.5">
+                <div
+                  className={` ${
+                    item.currentlyWorking ? "hidden" : "flex"
+                  } flex-col gap-1.5`}
+                >
                   <Label htmlFor="endDate">End Date</Label>
                   <Input
                     type="date"
@@ -150,11 +178,24 @@ const Experience = ({ enableNext }) => {
                   />
                 </div>
 
+                <div className="flex items-center gap-1.5 mt-5">
+                  <Checkbox
+                    id={`currentlyWorking-${idx}`}
+                    name="currentlyWorking"
+                    onCheckedChange={(e) => handleCheckBoxChange(e, idx)}
+                    defaultValue={item?.currentlyWorking}
+                    checked={item?.currentlyWorking}
+                  />
+                  <Label htmlFor={`currentlyWorking-${idx}`}>
+                    Currently Wokring Here
+                  </Label>
+                </div>
+
                 <div className="col-span-2">
                   <RichTextEditor
                     onRichTextEditorChange={(e) => handleRichTextEditor(e, idx)}
                     index={idx}
-                    defaultValue={item?.workSummary}
+                    defaultValue={item?.workSummery}
                   />
                 </div>
               </div>

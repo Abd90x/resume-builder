@@ -14,8 +14,11 @@ const resumeSlice = createSlice({
   name: "resume",
   initialState,
   reducers: {
-    clearSelectedResume: (state) => {
-      state.resume = null;
+    editResume: (state, action) => {
+      state.resume = {
+        ...state.resume,
+        ...action.payload,
+      };
     },
   },
   extraReducers: (builder) => {
@@ -77,5 +80,5 @@ const resumeSlice = createSlice({
   },
 });
 
-export const { clearSelectedResume } = resumeSlice.actions;
+export const { editResume } = resumeSlice.actions;
 export default resumeSlice.reducer;

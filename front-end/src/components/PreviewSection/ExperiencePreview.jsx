@@ -24,7 +24,7 @@ const ExperiencePreview = ({ resumeInfo }) => {
                   {exp?.startDate} - {exp?.endDate ? exp?.endDate : "Present"}
                 </span>
               </div>
-              <div dangerouslySetInnerHTML={{ __html: exp.workSummary }} />
+              <div dangerouslySetInnerHTML={{ __html: exp.workSummery }} />
             </div>
           ))}
       </div>

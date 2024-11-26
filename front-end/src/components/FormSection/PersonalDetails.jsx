@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import actUpdateResume from "@/store/resume/act/actUpdateResume";
+import { editResume } from "@/store/resume/resumeSlice";
 
 const PersonalDetails = ({ enableNext }) => {
   const { resume, loading, error } = useSelector((state) => state.resume);
@@ -20,6 +21,7 @@ const PersonalDetails = ({ enableNext }) => {
     enableNext(false);
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+    dispatch(editResume({ ...resume, [name]: value }));
   };
 
   const onSave = (e) => {
