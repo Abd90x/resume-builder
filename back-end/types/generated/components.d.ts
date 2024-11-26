@@ -21,6 +21,7 @@ export interface ExperienceExperience extends Struct.ComponentSchema {
   info: {
     displayName: 'experience';
     icon: 'star';
+    description: '';
   };
   attributes: {
     title: Schema.Attribute.String;
@@ -30,7 +31,7 @@ export interface ExperienceExperience extends Struct.ComponentSchema {
     startDate: Schema.Attribute.String;
     endDate: Schema.Attribute.String;
     currentlyWorking: Schema.Attribute.Boolean;
-    workSummary: Schema.Attribute.RichText;
+    workSummery: Schema.Attribute.RichText;
   };
 }
 
@@ -39,6 +40,7 @@ export interface EducationEducation extends Struct.ComponentSchema {
   info: {
     displayName: 'education';
     icon: 'book';
+    description: '';
   };
   attributes: {
     universityName: Schema.Attribute.String;
@@ -47,6 +49,7 @@ export interface EducationEducation extends Struct.ComponentSchema {
     startDate: Schema.Attribute.String;
     endDate: Schema.Attribute.String;
     description: Schema.Attribute.Text;
+    currentlyStudy: Schema.Attribute.Boolean;
   };
 }
 

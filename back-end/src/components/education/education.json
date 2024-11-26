@@ -2,7 +2,8 @@
   "collectionName": "components_education_educations",
   "info": {
     "displayName": "education",
-    "icon": "book"
+    "icon": "book",
+    "description": ""
   },
   "options": {},
   "attributes": {
@@ -23,6 +24,9 @@
     },
     "description": {
       "type": "text"
+    },
+    "currentlyStudy": {
+      "type": "boolean"
     }
   }
 }
