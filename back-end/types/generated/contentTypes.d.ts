@@ -22,7 +22,7 @@ export interface ApiUserResumeUserResume extends Struct.CollectionTypeSchema {
     address: Schema.Attribute.String;
     phone: Schema.Attribute.String;
     email: Schema.Attribute.String;
-    summery: Schema.Attribute.Text;
+    summary: Schema.Attribute.Text;
     education: Schema.Attribute.Component<'education.education', true>;
     experience: Schema.Attribute.Component<'experience.experience', true>;
     skills: Schema.Attribute.JSON;

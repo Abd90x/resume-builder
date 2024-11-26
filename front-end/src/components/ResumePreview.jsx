@@ -11,10 +11,7 @@ const ResumePreview = () => {
   const { resume, loading, error } = useSelector((state) => state.resume);
 
   return (
-    <div
-      className="h-full p-14 border-t-[20px] shadow-md print:shadow-none"
-      style={{ borderColor: resume?.themeColor }}
-    >
+    <div className="h-full p-14 shadow-md print:shadow-none border rounded-md print:border-none">
       {/* Personal Details */}
       <PersonalPreview resumeInfo={resume} />
       {/* Summery */}

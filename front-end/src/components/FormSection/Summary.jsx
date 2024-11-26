@@ -10,11 +10,11 @@ import { useDispatch, useSelector } from "react-redux";
 import actUpdateResume from "@/store/resume/act/actUpdateResume";
 import { editResume } from "@/store/resume/resumeSlice";
 
-const Summery = ({ enableNext }) => {
-  const [summery, setSummery] = useState();
+const Summary = ({ enableNext }) => {
+  const [summary, setSummary] = useState();
 
   const params = useParams();
-  const [aiGeneratedSummeryList, setAiGenerateSummeryList] = useState();
+  const [aiGeneratedSummeryList, setAiGenerateSummeryList] = useState([]);
 
   const { resume, loading, error } = useSelector((state) => state.resume);
 
@@ -26,59 +26,66 @@ const Summery = ({ enableNext }) => {
     const resumeId = params.resumeId;
     const data = {
       data: {
-        summery,
+        summary,
       },
     };
 
     dispatch(actUpdateResume({ id: resumeId, data: data }))
       .unwrap()
       .then(() => {
-        toast.success("Summery Updated!");
+        toast.success("Summary  Updated!");
         enableNext(true);
       });
   };
 
   useEffect(() => {
     if (resume) {
-      setSummery(resume?.summery);
+      setSummary(resume?.summary);
     }
   }, [resume]);
 
-  const generatesummeryFromAI = async () => {
+  const generatesummaryFromAI = async () => {
     setIsGenerateAI(true);
-    const prompt = `Job Title: ${resume?.jobTitle} , Depends on job title give me list of  summery for 3 experience level, Mid Level and Freasher level in 3 -4 lines in array format, With "summery" and "experience_level" Field in JSON Format`;
+    const prompt = `Job Title: ${resume?.jobTitle} , Depends on job title give me list of  summary  for 3 experience level, Mid Level and Freasher level in 3 -4 lines in JSON format like this 
+    summaries:[
+    {summary :"", experience_level:""}
+    ]
+    }`;
     const result = await AIChatSession.sendMessage(prompt);
-    setAiGenerateSummeryList(JSON.parse([result.response.text()]));
+    const textResponse = await result.response.text();
+    const resultData = JSON.parse(textResponse);
+
+    setAiGenerateSummeryList(resultData.summaries || []);
     setIsGenerateAI(false);
   };
 
-  const handleSummeryChange = (e) => {
+  const handleSummaryChange = (e) => {
     enableNext(false);
-    setSummery(e.target.value);
-    dispatch(editResume({ ...resume, summery: summery }));
+    setSummary(e.target.value);
+    dispatch(editResume({ ...resume, summary: summary }));
   };
 
-  const handleSelectAISummery = (summery) => {
+  const handleSelectAISummery = (summary) => {
     enableNext(false);
-    setSummery(summery);
-    dispatch(editResume({ ...resume, summery: summery }));
+    setSummary(summary);
+    dispatch(editResume({ ...resume, summary: summary }));
   };
 
   return (
     <div className="p-5 shadow-lg rounded-lg border-t-4 border-t-primary">
-      <h2 className="font-bold text-lg">summery</h2>
-      <p>Add summery for your job title</p>
+      <h2 className="font-bold text-lg">summary </h2>
+      <p>Add summary for your job title</p>
 
       <form onSubmit={onSave} className="flex flex-col gap-2.5">
         <div className="flex items-end justify-between mt-5">
-          <Label>Add summery</Label>
+          <Label>Add summary </Label>
           <Button
             variant="outline"
             size="sm"
             className="border-primary text-primary hover:bg-primary hover:text-white"
             type="button"
             disabled={isGenerateAI}
-            onClick={generatesummeryFromAI}
+            onClick={generatesummaryFromAI}
           >
             {isGenerateAI ? (
               <>
@@ -95,9 +102,8 @@ const Summery = ({ enableNext }) => {
         </div>
         <Textarea
           required
-          onChange={(e) => handleSummeryChange(e)}
-          value={summery}
-          defaultValue={resume?.summery}
+          onChange={(e) => handleSummaryChange(e)}
+          defaultValue={resume?.summary}
           className="h-60"
         />
         <div className="ms-auto">
@@ -113,20 +119,20 @@ const Summery = ({ enableNext }) => {
           </Button>
         </div>
       </form>
-      {aiGeneratedSummeryList && (
+      {aiGeneratedSummeryList.length > 0 && (
         <div className="flex flex-col gap-3">
-          <h2 className="text-lg font-bold">AI Generated summery</h2>
+          <h2 className="text-lg font-bold">AI Generated summary </h2>
           <div className="flex flex-col gap-3">
-            {aiGeneratedSummeryList?.map((item, index) => (
+            {aiGeneratedSummeryList.map((item, index) => (
               <div
                 key={index}
                 className="p-3 border rounded-lg hover:bg-secondary cursor-pointer"
                 onClick={() => {
-                  handleSelectAISummery(item?.summery);
+                  handleSelectAISummery(item?.summary);
                 }}
               >
                 <h3 className="font-bold">Level: {item.experience_level}</h3>
-                <p>{item?.summery}</p>
+                <p>{item?.summary}</p>
               </div>
             ))}
           </div>
@@ -136,4 +142,4 @@ const Summery = ({ enableNext }) => {
   );
 };
 
-export default Summery;
+export default Summary;

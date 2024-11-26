@@ -2,7 +2,7 @@ import { ArrowBigDownDash, ArrowLeft, ArrowRight, House } from "lucide-react";
 import PersonalDetails from "./FormSection/PersonalDetails";
 import { Button } from "./ui/button";
 import { useState } from "react";
-import Summary from "./FormSection/Summery";
+import Summary from "./FormSection/Summary";
 import Experience from "./FormSection/Experience";
 import Educational from "./FormSection/Educational";
 import Skills from "./FormSection/Skills";

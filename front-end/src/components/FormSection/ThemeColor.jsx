@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import actUpdateResume from "@/store/resume/act/actUpdateResume";
+import { editResume } from "@/store/resume/resumeSlice";
 
 const ThemeColor = () => {
   const [color, setColor] = useState(null);
@@ -38,6 +39,11 @@ const ThemeColor = () => {
         toast.success("Theme color updated !");
         setOpen(false);
       });
+  };
+
+  const handleColorChange = (color) => {
+    setColor(color);
+    dispatch(editResume({ ...resume, themeColor: color }));
   };
 
   useEffect(() => {
@@ -76,7 +82,7 @@ const ThemeColor = () => {
           <Label>Choose a color</Label>
           <HexColorPicker
             color={color ?? "#000000"}
-            onChange={setColor}
+            onChange={handleColorChange}
             className="w-full"
           />
 
@@ -87,7 +93,7 @@ const ThemeColor = () => {
                   key={color}
                   className="w-6 h-6 rounded-full cursor-pointer hover:opacity-50"
                   style={{ backgroundColor: color }}
-                  onClick={() => setColor(color)}
+                  onClick={() => handleColorChange(color)}
                 ></div>
               ))}
             </div>

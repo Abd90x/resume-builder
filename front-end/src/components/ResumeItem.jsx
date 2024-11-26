@@ -26,7 +26,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Label } from "./ui/label";
 
 import { useState } from "react";
 import { toast } from "sonner";

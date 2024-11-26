@@ -1,6 +1,7 @@
 import ResumePreview from "@/components/ResumePreview";
+import { Button } from "@/components/ui/button";
 import actGetResume from "@/store/resume/act/actGetResume";
-import { LoaderPinwheel } from "lucide-react";
+import { ArrowBigDownDash, LoaderPinwheel } from "lucide-react";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
@@ -27,7 +28,26 @@ const Resume = () => {
           <p>We Are creating your resume please wait</p>
         </div>
       ) : (
-        <ResumePreview />
+        <>
+          <div className="flex flex-col gap-6 mt-8 print:m-4">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4 print:hidden">
+              <div className="space-y-2">
+                <h1 className="text-3xl font-bold">Your Resume is Ready! 🎉</h1>
+                <h3>
+                  <span className="text-primary">Congratulations!</span> Your
+                  professionally crafted resume is now ready to download and
+                  share with potential employers.
+                </h3>
+              </div>
+              <div className="flex items-center gap-4">
+                <Button size="lg" onClick={() => window.print()}>
+                  Download <ArrowBigDownDash />
+                </Button>
+              </div>
+            </div>
+            <ResumePreview />
+          </div>
+        </>
       )}
     </div>
   );

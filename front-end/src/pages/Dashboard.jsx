@@ -1,6 +1,7 @@
 import AddResume from "@/components/AddResume";
 import ResumeItem from "@/components/ResumeItem";
 import actGetUserResumes from "@/store/resume/act/actGetUserResumes";
+import { resetResume } from "@/store/resume/resumeSlice";
 import { useUser } from "@clerk/clerk-react";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -15,6 +16,7 @@ const Dashboard = () => {
   useEffect(() => {
     user &&
       dispatch(actGetUserResumes(user?.primaryEmailAddress?.emailAddress));
+    dispatch(resetResume());
   }, [user, dispatch]);
 
   return (

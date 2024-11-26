@@ -20,6 +20,9 @@ const resumeSlice = createSlice({
         ...action.payload,
       };
     },
+    resetResume: (state) => {
+      state.resume = null;
+    },
   },
   extraReducers: (builder) => {
     // Get Resume
@@ -80,5 +83,5 @@ const resumeSlice = createSlice({
   },
 });
 
-export const { editResume } = resumeSlice.actions;
+export const { editResume, resetResume } = resumeSlice.actions;
 export default resumeSlice.reducer;
