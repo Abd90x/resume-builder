@@ -8,38 +8,16 @@ import { Button } from "../ui/button";
 import { Label } from "../ui/label";
 import { useEffect, useState } from "react";
 import { HexColorPicker } from "react-colorful";
-import { toast } from "sonner";
-import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import actUpdateResume from "@/store/resume/act/actUpdateResume";
 import { editResume } from "@/store/resume/resumeSlice";
 
 const ThemeColor = () => {
   const [color, setColor] = useState(null);
   const [open, setOpen] = useState(false);
-  const resumeId = useParams().resumeId;
 
-  const { resume, loading, error } = useSelector((state) => state.resume);
+  const { resume, loading } = useSelector((state) => state.resume);
 
   const dispatch = useDispatch();
-
-  const handleSave = () => {
-    dispatch(
-      actUpdateResume({
-        id: resumeId,
-        data: {
-          data: {
-            themeColor: color,
-          },
-        },
-      })
-    )
-      .unwrap()
-      .then(() => {
-        toast.success("Theme color updated !");
-        setOpen(false);
-      });
-  };
 
   const handleColorChange = (color) => {
     setColor(color);
@@ -100,15 +78,7 @@ const ThemeColor = () => {
           </div>
 
           <div className="flex justify-end">
-            <Button disabled={loading === "pending"} onClick={handleSave}>
-              {loading === "pending" ? (
-                <>
-                  <Loader className="animate-spin" />
-                </>
-              ) : (
-                "Save"
-              )}
-            </Button>
+            <Button onClick={() => setOpen(false)}>Save</Button>
           </div>
         </div>
       </PopoverContent>

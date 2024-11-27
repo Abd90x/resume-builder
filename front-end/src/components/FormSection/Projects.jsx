@@ -1,79 +1,13 @@
-import { useEffect, useState } from "react";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Button } from "../ui/button";
-import { Loader, PlusCircle, Trash } from "lucide-react";
-import { useParams } from "react-router-dom";
-import { toast } from "sonner";
+import { PlusCircle, Trash } from "lucide-react";
 import { Textarea } from "../ui/textarea";
-import { useSelector, useDispatch } from "react-redux";
-import actUpdateResume from "@/store/resume/act/actUpdateResume";
-import { editResume } from "@/store/resume/resumeSlice";
+import useProjects from "@/hooks/useProjects";
 
-const Projects = ({ enableNext }) => {
-  const dispatch = useDispatch();
-  const { resume, loading, error } = useSelector((state) => state.resume);
-
-  const [projectsList, setProjectsList] = useState([
-    {
-      projectName: "",
-      description: "",
-      techStack: "",
-      github_repo: "",
-      live_demo: "",
-    },
-  ]);
-
-  const params = useParams();
-
-  useEffect(() => {
-    resume?.projects?.length > 0 && setProjectsList(resume?.projects);
-  }, [resume]);
-
-  const handleChange = (event, index) => {
-    enableNext(false);
-    const newEntries = JSON.parse(JSON.stringify(projectsList));
-    const { name, value } = event.target;
-    newEntries[index][name] = value;
-    setProjectsList(newEntries);
-    dispatch(editResume({ ...resume, projects: newEntries }));
-  };
-
-  const addNewProjects = () => {
-    setProjectsList([
-      ...projectsList,
-      {
-        projectName: "",
-        description: "",
-        techStack: "",
-        github_repo: "",
-        live_demo: "",
-      },
-    ]);
-  };
-
-  const removeProjects = () => {
-    const newEntries = JSON.parse(JSON.stringify(projectsList));
-    setProjectsList(newEntries);
-    dispatch(editResume({ ...resume, projects: newEntries }));
-  };
-
-  const onSave = () => {
-    const data = {
-      data: {
-        projects: projectsList.map(({ id, ...project }) => project),
-      },
-    };
-
-    const resumeId = params.resumeId;
-
-    dispatch(actUpdateResume({ id: resumeId, data: data }))
-      .unwrap()
-      .then(() => {
-        toast.success("Projects Details updated !");
-        enableNext(true);
-      });
-  };
+const Projects = () => {
+  const { handleChange, addNewProjects, removeProjects, projectsList } =
+    useProjects();
   return (
     <div className="p-5 shadow-lg rounded-lg border-t-4 border-t-primary">
       <h2 className="font-bold text-lg">Projects</h2>
@@ -160,9 +94,6 @@ const Projects = ({ enableNext }) => {
             <PlusCircle />
           </Button>
         </div>
-        <Button disabled={loading === "pending"} onClick={() => onSave()}>
-          {loading === "pending" ? <Loader className="animate-spin" /> : "Save"}
-        </Button>
       </div>
     </div>
   );

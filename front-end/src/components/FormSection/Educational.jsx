@@ -1,97 +1,21 @@
-import { useEffect, useState } from "react";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Button } from "../ui/button";
-import { Loader, PlusCircle, Trash } from "lucide-react";
-import { useParams } from "react-router-dom";
-import { toast } from "sonner";
+import { PlusCircle, Trash } from "lucide-react";
 import { Textarea } from "../ui/textarea";
-import { useSelector, useDispatch } from "react-redux";
-import actUpdateResume from "@/store/resume/act/actUpdateResume";
-import { editResume } from "@/store/resume/resumeSlice";
+
 import { Checkbox } from "../ui/checkbox";
+import useEducation from "@/hooks/useEducation";
 
-const Educational = ({ enableNext }) => {
-  const dispatch = useDispatch();
-  const { resume, loading, error } = useSelector((state) => state.resume);
+const Educational = () => {
+  const {
+    handleChange,
+    addNewEducation,
+    removeEducation,
+    handleCheckBoxChange,
+    educationList,
+  } = useEducation();
 
-  const [educationList, setEducationList] = useState([
-    {
-      universityName: "",
-      degree: "",
-      major: "",
-      startDate: "",
-      endDate: "",
-      description: "",
-    },
-  ]);
-
-  const params = useParams();
-
-  useEffect(() => {
-    resume?.education.length > 0 && setEducationList(resume?.education);
-  }, [resume]);
-
-  const handleChange = (event, index) => {
-    enableNext(false);
-    const newEntries = JSON.parse(JSON.stringify(educationList));
-    const { name, value } = event.target;
-    newEntries[index][name] = value;
-    setEducationList(newEntries);
-
-    dispatch(editResume({ ...resume, education: newEntries }));
-  };
-
-  const addNewEducation = () => {
-    enableNext(false);
-    setEducationList([
-      ...educationList,
-      {
-        universityName: "",
-        degree: "",
-        major: "",
-        startDate: "",
-        endDate: "",
-        description: "",
-      },
-    ]);
-  };
-
-  const removeEducation = () => {
-    const newEntries = JSON.parse(JSON.stringify(educationList));
-
-    setEducationList(newEntries);
-
-    dispatch(editResume({ ...resume, education: newEntries }));
-  };
-
-  const handleCheckBoxChange = (e, index) => {
-    enableNext(false);
-    const newEntries = JSON.parse(JSON.stringify(educationList));
-
-    newEntries[index] = {
-      ...newEntries[index],
-      currentlyStudy: e,
-      endDate: e ? "" : newEntries[index].endDate,
-    };
-    setEducationList(newEntries);
-    dispatch(editResume({ ...resume, education: newEntries }));
-  };
-
-  const onSave = () => {
-    const data = {
-      data: {
-        education: educationList.map(({ id, ...edu }) => edu),
-      },
-    };
-    const resumeId = params.resumeId;
-    dispatch(actUpdateResume({ id: resumeId, data: data }))
-      .unwrap()
-      .then(() => {
-        toast.success("Education Details updated !");
-        enableNext(true);
-      });
-  };
   return (
     <div className="p-5 shadow-lg rounded-lg border-t-4 border-t-primary">
       <h2 className="font-bold text-lg">Education</h2>
@@ -207,9 +131,6 @@ const Educational = ({ enableNext }) => {
             <PlusCircle />
           </Button>
         </div>
-        <Button disabled={loading === "pending"} onClick={() => onSave()}>
-          {loading === "pending" ? <Loader className="animate-spin" /> : "Save"}
-        </Button>
       </div>
     </div>
   );

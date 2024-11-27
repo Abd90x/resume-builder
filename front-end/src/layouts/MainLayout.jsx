@@ -1,3 +1,4 @@
+import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { Toaster } from "@/components/ui/sonner";
 import { useUser } from "@clerk/clerk-react";
@@ -15,6 +16,7 @@ const MainLayout = () => {
       <Header />
       <Outlet />
       <Toaster />
+      <Footer />
     </>
   );
 };

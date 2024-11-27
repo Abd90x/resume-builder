@@ -1,73 +1,12 @@
-import { useEffect, useState } from "react";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { Loader, Plus, Trash } from "lucide-react";
-import { useParams } from "react-router-dom";
-import { toast } from "sonner";
-import { useDispatch, useSelector } from "react-redux";
-import actUpdateResume from "@/store/resume/act/actUpdateResume";
-import { editResume } from "@/store/resume/resumeSlice";
+import { Plus, Trash } from "lucide-react";
+import useSkills from "@/hooks/useSkills";
 
-const Skills = ({ enableNext }) => {
-  const dispatch = useDispatch();
-  const params = useParams();
-
-  const [skillInput, setSkillInput] = useState({ soft: "", technical: "" });
-  const [skills, setSkills] = useState({ softSkills: [], technicalSkills: [] });
-
-  const { resume, loading } = useSelector((state) => state.resume);
-
-  // Fetch skills from resume on mount
-  useEffect(() => {
-    if (resume?.skills) setSkills(resume.skills);
-  }, [resume]);
-
-  // Generic function to add a skill
-  const addSkill = (type) => {
-    const skillKey = type === "soft" ? "softSkills" : "technicalSkills";
-    const newSkill = skillInput[type].trim();
-
-    if (!newSkill) return toast.error("Skill cannot be empty!");
-    if (skills[skillKey].includes(newSkill)) {
-      return toast.error("Skill already exists!");
-    }
-
-    const updatedSkills = {
-      ...skills,
-      [skillKey]: [...skills[skillKey], newSkill],
-    };
-
-    setSkills(updatedSkills);
-    dispatch(editResume({ ...resume, skills: updatedSkills }));
-    setSkillInput({ ...skillInput, [type]: "" });
-    enableNext(false);
-  };
-
-  // Generic function to remove a skill
-  const removeSkill = (type, idx) => {
-    const skillKey = type === "soft" ? "softSkills" : "technicalSkills";
-    const updatedSkills = {
-      ...skills,
-      [skillKey]: skills[skillKey].filter((_, i) => i !== idx),
-    };
-
-    setSkills(updatedSkills);
-    dispatch(editResume({ ...resume, skills: updatedSkills }));
-    enableNext(false);
-  };
-
-  // Save changes
-  const handleSave = () => {
-    const resumeId = params.resumeId;
-    dispatch(actUpdateResume({ id: resumeId, data: { data: { skills } } }))
-      .unwrap()
-      .then(() => {
-        toast.success("Skills Updated!");
-        enableNext(true);
-      });
-  };
-
+const Skills = () => {
+  const { addSkill, removeSkill, skillInput, setSkillInput, skills } =
+    useSkills();
   return (
     <div className="p-5 shadow-lg rounded-lg border-t-4 border-t-primary">
       <h2 className="font-bold text-lg">Skills</h2>
@@ -79,7 +18,11 @@ const Skills = ({ enableNext }) => {
           const label = type === "soft" ? "Soft Skills" : "Technical Skills";
 
           return (
-            <form key={type} className="flex flex-col gap-1.5">
+            <form
+              key={type}
+              className="flex flex-col gap-1.5"
+              onSubmit={(e) => e.preventDefault()}
+            >
               <Label htmlFor={type}>{label}</Label>
               <Input
                 id={type}
@@ -118,20 +61,6 @@ const Skills = ({ enableNext }) => {
             </form>
           );
         })}
-
-        {/* Save Button */}
-        <div className="ms-auto">
-          <Button onClick={handleSave} disabled={loading === "pending"}>
-            {loading === "pending" ? (
-              <span className="flex items-center gap-2">
-                Saving
-                <Loader className="animate-spin" />
-              </span>
-            ) : (
-              "Save"
-            )}
-          </Button>
-        </div>
       </div>
     </div>
   );

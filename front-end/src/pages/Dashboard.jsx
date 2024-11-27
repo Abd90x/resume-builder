@@ -1,4 +1,5 @@
 import AddResume from "@/components/AddResume";
+import Loading from "@/components/Feedback/Loading";
 import ResumeItem from "@/components/ResumeItem";
 import actGetUserResumes from "@/store/resume/act/actGetUserResumes";
 import { resetResume } from "@/store/resume/resumeSlice";
@@ -20,19 +21,21 @@ const Dashboard = () => {
   }, [user, dispatch]);
 
   return (
-    <div className="container flex flex-col gap-8 py-14">
+    <div className="container flex flex-col gap-8 py-14 mb-32">
       <div className="flex flex-col gap-2">
         <h1 className="text-3xl font-bold ">My Resume</h1>
         <p>Start Creating AI Resume</p>
       </div>
+      <Loading loading={loading} error={error} type="resume">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          <AddResume />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-        <AddResume />
-        {resumes?.data &&
-          resumes.data.map((resume) => (
-            <ResumeItem resume={resume} key={resume.id} />
-          ))}
-      </div>
+          {resumes?.data &&
+            resumes.data.map((resume) => (
+              <ResumeItem resume={resume} key={resume.id} />
+            ))}
+        </div>
+      </Loading>
     </div>
   );
 };

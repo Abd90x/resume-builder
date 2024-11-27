@@ -21,13 +21,17 @@ import { useSelector } from "react-redux";
 
 const RichTextEditor = ({ onRichTextEditorChange, index, defaultValue }) => {
   const [value, setValue] = useState();
+  const [aiLoading, setAiLoading] = useState(false);
 
-  const { resume, loading, error } = useSelector((state) => state.resume);
+  const { resume } = useSelector((state) => state.resume);
 
   const generateSummaryFromAI = async () => {
+    setAiLoading(true);
     const position = resume.experience[index].title;
     if (!position) {
       toast.error("Please enter a job title to generate the summary");
+      setAiLoading(false);
+
       return;
     }
     const prompt = `In my role as ${position} give me 2 - 3 lines for my current job overview in resume`;
@@ -36,6 +40,8 @@ const RichTextEditor = ({ onRichTextEditorChange, index, defaultValue }) => {
     let res = result.response.text();
     res = res.replace(/[^a-zA-Z0-9]/g, " ");
     setValue(res);
+    setAiLoading(false);
+
     onRichTextEditorChange({
       target: {
         value: res,
@@ -56,9 +62,9 @@ const RichTextEditor = ({ onRichTextEditorChange, index, defaultValue }) => {
           variant="outline"
           className="border-primary text-primary hover:bg-primary hover:text-white"
           onClick={generateSummaryFromAI}
-          disabled={loading === "pending"}
+          disabled={aiLoading}
         >
-          {loading === "pending" ? (
+          {aiLoading ? (
             <>
               Generating <Loader className="animate-spin" />
             </>

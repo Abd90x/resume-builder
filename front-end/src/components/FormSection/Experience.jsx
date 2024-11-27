@@ -1,97 +1,20 @@
-import { useEffect, useState } from "react";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Button } from "../ui/button";
-import { Loader, PlusCircle, Trash } from "lucide-react";
+import { PlusCircle, Trash } from "lucide-react";
 import RichTextEditor from "./RichTextEditor";
-import { useParams } from "react-router-dom";
-import { toast } from "sonner";
-import { useDispatch, useSelector } from "react-redux";
-import actUpdateResume from "@/store/resume/act/actUpdateResume";
-import { editResume } from "@/store/resume/resumeSlice";
 import { Checkbox } from "../ui/checkbox";
+import useExperince from "@/hooks/useExperince";
 
-const Experience = ({ enableNext }) => {
-  const dispatch = useDispatch();
-  const [experinceList, setExperinceList] = useState([]);
-
-  const params = useParams();
-
-  const { resume, loading, error } = useSelector((state) => state.resume);
-
-  useEffect(() => {
-    resume?.experience.length > 0 && setExperinceList(resume?.experience);
-  }, [resume]);
-
-  const handleChange = (event, index) => {
-    enableNext(false);
-    const newEntries = JSON.parse(JSON.stringify(experinceList));
-    const { name, value } = event.target;
-    newEntries[index][name] = value;
-    setExperinceList(newEntries);
-    dispatch(editResume({ ...resume, experience: newEntries }));
-  };
-
-  const addNewExperience = () => {
-    enableNext(false);
-    setExperinceList([
-      ...experinceList,
-      {
-        title: "",
-        companyName: "",
-        city: "",
-        state: "",
-        startDate: "",
-        endDate: "",
-        workSummery: "",
-      },
-    ]);
-  };
-
-  const removeExperience = () => {
-    const newEntries = experinceList.slice(0, -1);
-
-    setExperinceList(newEntries);
-    dispatch(editResume({ ...resume, experience: newEntries }));
-  };
-
-  const handleRichTextEditor = (e, index) => {
-    enableNext(false);
-    const value = e.target.value;
-    const newEntries = JSON.parse(JSON.stringify(experinceList));
-    newEntries[index]["workSummery"] = value;
-    setExperinceList(newEntries);
-
-    dispatch(editResume({ ...resume, experience: newEntries }));
-  };
-
-  const onSave = () => {
-    const data = {
-      data: {
-        experience: experinceList.map(({ id, ...exp }) => exp),
-      },
-    };
-    const resumeId = params.resumeId;
-    dispatch(actUpdateResume({ id: resumeId, data: data }))
-      .unwrap()
-      .then(() => {
-        toast.success("Experience Details updated !");
-        enableNext(true);
-      });
-  };
-
-  const handleCheckBoxChange = (e, index) => {
-    enableNext(false);
-    const newEntries = JSON.parse(JSON.stringify(experinceList));
-
-    newEntries[index] = {
-      ...newEntries[index],
-      currentlyWorking: e,
-      endDate: e ? "" : newEntries[index].endDate,
-    };
-    setExperinceList(newEntries);
-    dispatch(editResume({ ...resume, experience: newEntries }));
-  };
+const Experience = () => {
+  const {
+    handleChange,
+    addNewExperience,
+    removeExperience,
+    handleRichTextEditor,
+    handleCheckBoxChange,
+    experinceList,
+  } = useExperince();
 
   return (
     <div className="p-5 shadow-lg rounded-lg border-t-4 border-t-primary">
@@ -217,9 +140,6 @@ const Experience = ({ enableNext }) => {
             <PlusCircle />
           </Button>
         </div>
-        <Button disabled={loading === "pending"} onClick={() => onSave()}>
-          {loading === "pending" ? <Loader className="animate-spin" /> : "Save"}
-        </Button>
       </div>
     </div>
   );
