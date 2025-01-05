@@ -11,7 +11,6 @@ const Summary = () => {
     generatesummaryFromAI,
     handleSelectAISummery,
     isGenerateAI,
-    resume,
     summary,
   } = useSummary();
 

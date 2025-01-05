@@ -6,8 +6,13 @@ import { Textarea } from "../ui/textarea";
 import useProjects from "@/hooks/useProjects";
 
 const Projects = () => {
-  const { handleChange, addNewProjects, removeProjects, projectsList } =
-    useProjects();
+  const {
+    handleChange,
+    addNewProjects,
+    removeProjects,
+    projectsList,
+    loading,
+  } = useProjects();
   return (
     <div className="p-5 shadow-lg rounded-lg border-t-4 border-t-primary">
       <h2 className="font-bold text-lg">Projects</h2>
@@ -25,6 +30,7 @@ const Projects = () => {
                     name="projectName"
                     id="projectName"
                     defaultValue={item?.projectName}
+                    disabled={loading === "pending"}
                     onChange={(e) => handleChange(e, idx)}
                   />
                 </div>
@@ -37,6 +43,7 @@ const Projects = () => {
                     name="techStack"
                     id="techStack"
                     defaultValue={item?.techStack}
+                    disabled={loading === "pending"}
                     onChange={(e) => handleChange(e, idx)}
                   />
                 </div>
@@ -49,6 +56,7 @@ const Projects = () => {
                     name="github_repo"
                     id="github_repo"
                     defaultValue={item?.github_repo}
+                    disabled={loading === "pending"}
                     onChange={(e) => handleChange(e, idx)}
                   />
                 </div>
@@ -61,6 +69,7 @@ const Projects = () => {
                     name="live_demo"
                     id="live_demo"
                     defaultValue={item?.live_demo}
+                    disabled={loading === "pending"}
                     onChange={(e) => handleChange(e, idx)}
                   />
                 </div>
@@ -72,6 +81,7 @@ const Projects = () => {
                     name="description"
                     id="description"
                     defaultValue={item?.description}
+                    disabled={loading === "pending"}
                     onChange={(e) => handleChange(e, idx)}
                   />
                 </div>
@@ -84,12 +94,16 @@ const Projects = () => {
         <div className="flex items-center gap-3">
           <Button
             variant="destructive"
-            disabled={projectsList.length === 0}
+            disabled={projectsList.length === 0 || loading === "pending"}
             onClick={removeProjects}
           >
             <Trash />
           </Button>
-          <Button variant="outline" onClick={addNewProjects}>
+          <Button
+            variant="outline"
+            onClick={addNewProjects}
+            disabled={loading === "pending"}
+          >
             Add More Projects
             <PlusCircle />
           </Button>

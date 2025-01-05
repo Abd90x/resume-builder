@@ -41,8 +41,6 @@ const FormSection = () => {
       },
     };
 
-    setActiveFormIndex(7);
-
     dispatch(
       actUpdateResume({
         id: resumeId,
@@ -51,6 +49,7 @@ const FormSection = () => {
     )
       .unwrap()
       .then(() => {
+        setActiveFormIndex(7);
         dispatch(actGetResume(resumeId));
       });
   };

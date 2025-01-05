@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { Github, Linkedin } from "lucide-react";
 
 const PersonalPreview = ({ resumeInfo }) => {
