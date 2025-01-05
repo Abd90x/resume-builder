@@ -6,6 +6,7 @@ import { Textarea } from "../ui/textarea";
 
 import { Checkbox } from "../ui/checkbox";
 import useEducation from "@/hooks/useEducation";
+import DatePicker from "../ui/date-picker";
 
 const Educational = () => {
   const {
@@ -15,6 +16,12 @@ const Educational = () => {
     handleCheckBoxChange,
     educationList,
   } = useEducation();
+
+  const handleSelectDate = (e, idx, name) => {
+    const value = e && e.toString().substr(0, 15);
+    const event = { target: { name, value } };
+    handleChange(event, idx);
+  };
 
   return (
     <div className="p-5 shadow-lg rounded-lg border-t-4 border-t-primary">
@@ -63,13 +70,11 @@ const Educational = () => {
 
                 <div className="flex flex-col gap-1.5">
                   <Label htmlFor="startDate">Start Date</Label>
-                  <Input
-                    type="date"
-                    placeholder="Start Date"
-                    name="startDate"
-                    id="startDate"
-                    defaultValue={item?.startDate}
-                    onChange={(e) => handleChange(e, idx)}
+                  <DatePicker
+                    defaultDate={item?.startDate && new Date(item.startDate)}
+                    handleSelectDate={(e) =>
+                      handleSelectDate(e, idx, "startDate")
+                    }
                   />
                 </div>
 
@@ -79,13 +84,11 @@ const Educational = () => {
                   } flex-col gap-1.5`}
                 >
                   <Label htmlFor="endDate">End Date</Label>
-                  <Input
-                    type="date"
-                    placeholder="End Date"
-                    name="endDate"
-                    id="endDate"
-                    defaultValue={item?.endDate}
-                    onChange={(e) => handleChange(e, idx)}
+                  <DatePicker
+                    defaultDate={item?.endDate && new Date(item.endDate)}
+                    handleSelectDate={(e) =>
+                      handleSelectDate(e, idx, "endDate")
+                    }
                   />
                 </div>
 

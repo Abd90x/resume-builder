@@ -5,11 +5,14 @@ const ProjectsPreview = ({ resumeInfo }) => {
     <div className="flex flex-col gap-2 py-3">
       <h2
         className="text-center font-bold text-sm "
-        style={{ color: resumeInfo?.themeColor }}
+        style={{ color: resumeInfo?.themeColor ?? "#000" }}
       >
         Projects
       </h2>
-      <hr className="" style={{ borderColor: resumeInfo?.themeColor }} />
+      <hr
+        className=""
+        style={{ borderColor: resumeInfo?.themeColor ?? "#000" }}
+      />
       <div className="flex flex-col gap-4">
         {resumeInfo?.projects &&
           resumeInfo?.projects.map((prj, index) => (

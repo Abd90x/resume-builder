@@ -3,11 +3,14 @@ const SkillsPreview = ({ resumeInfo }) => {
     <div className="flex flex-col gap-2 py-5">
       <h2
         className="text-center font-bold text-sm "
-        style={{ color: resumeInfo?.themeColor }}
+        style={{ color: resumeInfo?.themeColor ?? "#000" }}
       >
         Skills
       </h2>
-      <hr className="" style={{ borderColor: resumeInfo?.themeColor }} />
+      <hr
+        className=""
+        style={{ borderColor: resumeInfo?.themeColor ?? "#000" }}
+      />
 
       {resumeInfo?.skills?.softSkills && (
         <p className="text-sm font-bold">Soft Skills</p>
@@ -18,7 +21,7 @@ const SkillsPreview = ({ resumeInfo }) => {
             <div
               key={index}
               className="flex gap-1 text-sm p-1 rounded-md text-white"
-              style={{ backgroundColor: resumeInfo?.themeColor }}
+              style={{ backgroundColor: resumeInfo?.themeColor ?? "#000" }}
             >
               <h3 className="font-medium">{skill}</h3>
             </div>
@@ -34,7 +37,7 @@ const SkillsPreview = ({ resumeInfo }) => {
             <div
               key={index}
               className="flex gap-1 text-sm p-1 rounded-md text-white"
-              style={{ backgroundColor: resumeInfo?.themeColor }}
+              style={{ backgroundColor: resumeInfo?.themeColor ?? "#000" }}
             >
               <h3 className="font-medium">{skill}</h3>
             </div>

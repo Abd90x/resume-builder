@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import { Github, Linkedin } from "lucide-react";
 
 const PersonalPreview = ({ resumeInfo }) => {
@@ -6,7 +5,7 @@ const PersonalPreview = ({ resumeInfo }) => {
     <div className="flex flex-col gap-1">
       <h2
         className="font-bold text-xl text-center"
-        style={{ color: resumeInfo?.themeColor }}
+        style={{ color: resumeInfo?.themeColor ?? "#000" }}
       >
         {resumeInfo?.firstName} {resumeInfo?.lastName}
       </h2>

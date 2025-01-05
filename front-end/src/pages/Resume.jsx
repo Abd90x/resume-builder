@@ -17,7 +17,7 @@ const Resume = () => {
   }, [dispatch, resumeId]);
 
   return (
-    <div className="container print:!p-0 ">
+    <div className="container print:!p-0 mb-9 print:m-0">
       {loading === "pending" ? (
         <div className="flex flex-col justify-center items-center h-[calc(100vh-90px)]">
           <LoaderPinwheel

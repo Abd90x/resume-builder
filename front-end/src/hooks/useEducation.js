@@ -6,16 +6,7 @@ const useEducation = () => {
   const dispatch = useDispatch();
   const { resume } = useSelector((state) => state.resume);
 
-  const [educationList, setEducationList] = useState([
-    {
-      universityName: "",
-      degree: "",
-      major: "",
-      startDate: "",
-      endDate: "",
-      description: "",
-    },
-  ]);
+  const [educationList, setEducationList] = useState(resume?.education);
 
   useEffect(() => {
     resume?.education.length > 0 && setEducationList(resume?.education);
@@ -45,7 +36,10 @@ const useEducation = () => {
   };
 
   const removeEducation = () => {
+    if (educationList.length === 1) return;
+
     const newEntries = JSON.parse(JSON.stringify(educationList));
+    newEntries.pop();
 
     setEducationList(newEntries);
 
