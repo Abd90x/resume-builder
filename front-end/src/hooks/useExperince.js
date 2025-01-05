@@ -63,6 +63,12 @@ const useExperince = () => {
     dispatch(editResume({ ...resume, experience: newEntries }));
   };
 
+  const handleSelectDate = (e, idx, name) => {
+    const value = e && e.toString().substr(0, 15);
+    const event = { target: { name, value } };
+    handleChange(event, idx);
+  };
+
   return {
     handleChange,
     addNewExperience,
@@ -70,6 +76,7 @@ const useExperince = () => {
     handleRichTextEditor,
     handleCheckBoxChange,
     experinceList,
+    handleSelectDate,
   };
 };
 

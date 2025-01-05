@@ -5,6 +5,7 @@ import { PlusCircle, Trash } from "lucide-react";
 import RichTextEditor from "./RichTextEditor";
 import { Checkbox } from "../ui/checkbox";
 import useExperince from "@/hooks/useExperince";
+import DatePicker from "../ui/date-picker";
 
 const Experience = () => {
   const {
@@ -14,6 +15,7 @@ const Experience = () => {
     handleRichTextEditor,
     handleCheckBoxChange,
     experinceList,
+    handleSelectDate,
   } = useExperince();
 
   return (
@@ -75,13 +77,11 @@ const Experience = () => {
 
                 <div className="flex flex-col gap-1.5">
                   <Label htmlFor="startDate">Start Date</Label>
-                  <Input
-                    type="date"
-                    placeholder="Start Date"
-                    name="startDate"
-                    id="startDate"
-                    defaultValue={item?.startDate}
-                    onChange={(e) => handleChange(e, idx)}
+                  <DatePicker
+                    defaultDate={item?.startDate && new Date(item.startDate)}
+                    handleSelectDate={(e) =>
+                      handleSelectDate(e, idx, "startDate")
+                    }
                   />
                 </div>
 
@@ -91,13 +91,11 @@ const Experience = () => {
                   } flex-col gap-1.5`}
                 >
                   <Label htmlFor="endDate">End Date</Label>
-                  <Input
-                    type="date"
-                    placeholder="End Date"
-                    name="endDate"
-                    id="endDate"
-                    defaultValue={item?.endDate}
-                    onChange={(e) => handleChange(e, idx)}
+                  <DatePicker
+                    defaultDate={item?.endDate && new Date(item.endDate)}
+                    handleSelectDate={(e) =>
+                      handleSelectDate(e, idx, "endDate")
+                    }
                   />
                 </div>
 

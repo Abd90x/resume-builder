@@ -6,6 +6,7 @@ import { resetResume } from "@/store/resume/resumeSlice";
 import { useUser } from "@clerk/clerk-react";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { Navigate } from "react-router-dom";
 
 const Dashboard = () => {
   const { user } = useUser();
@@ -19,6 +20,8 @@ const Dashboard = () => {
       dispatch(actGetUserResumes(user?.primaryEmailAddress?.emailAddress));
     dispatch(resetResume());
   }, [user, dispatch]);
+
+  if (!user) return <Navigate to="/signin" />;
 
   return (
     <div className="container flex flex-col gap-8 py-14 mb-32">

@@ -58,12 +58,19 @@ const useEducation = () => {
     dispatch(editResume({ ...resume, education: newEntries }));
   };
 
+  const handleSelectDate = (e, idx, name) => {
+    const value = e && e.toString().substr(0, 15);
+    const event = { target: { name, value } };
+    handleChange(event, idx);
+  };
+
   return {
     handleChange,
     addNewEducation,
     removeEducation,
     handleCheckBoxChange,
     educationList,
+    handleSelectDate,
   };
 };
 

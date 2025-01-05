@@ -15,13 +15,8 @@ const Educational = () => {
     removeEducation,
     handleCheckBoxChange,
     educationList,
+    handleSelectDate,
   } = useEducation();
-
-  const handleSelectDate = (e, idx, name) => {
-    const value = e && e.toString().substr(0, 15);
-    const event = { target: { name, value } };
-    handleChange(event, idx);
-  };
 
   return (
     <div className="p-5 shadow-lg rounded-lg border-t-4 border-t-primary">
