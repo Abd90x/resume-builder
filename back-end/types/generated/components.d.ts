@@ -1,21 +1,5 @@
 import type { Struct, Schema } from '@strapi/strapi';
 
-export interface ProjectsProjects extends Struct.ComponentSchema {
-  collectionName: 'components_projects_projects';
-  info: {
-    displayName: 'Projects';
-    icon: 'archive';
-    description: '';
-  };
-  attributes: {
-    projectName: Schema.Attribute.String;
-    description: Schema.Attribute.Text;
-    github_repo: Schema.Attribute.String;
-    live_demo: Schema.Attribute.String;
-    techStack: Schema.Attribute.Text;
-  };
-}
-
 export interface ExperienceExperience extends Struct.ComponentSchema {
   collectionName: 'components_experience_experiences';
   info: {
@@ -32,6 +16,22 @@ export interface ExperienceExperience extends Struct.ComponentSchema {
     endDate: Schema.Attribute.String;
     currentlyWorking: Schema.Attribute.Boolean;
     workSummery: Schema.Attribute.RichText;
+  };
+}
+
+export interface ProjectsProjects extends Struct.ComponentSchema {
+  collectionName: 'components_projects_projects';
+  info: {
+    displayName: 'Projects';
+    icon: 'archive';
+    description: '';
+  };
+  attributes: {
+    projectName: Schema.Attribute.String;
+    description: Schema.Attribute.Text;
+    github_repo: Schema.Attribute.String;
+    live_demo: Schema.Attribute.String;
+    techStack: Schema.Attribute.Text;
   };
 }
 
@@ -56,8 +56,8 @@ export interface EducationEducation extends Struct.ComponentSchema {
 declare module '@strapi/strapi' {
   export module Public {
     export interface ComponentSchemas {
-      'projects.projects': ProjectsProjects;
       'experience.experience': ExperienceExperience;
+      'projects.projects': ProjectsProjects;
       'education.education': EducationEducation;
     }
   }
